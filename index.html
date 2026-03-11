@@ -16,8 +16,7 @@
 					<header id="header">
 						<h1>Lim Zheng Jie</h1>
 						<div id="container">
-							<p><span class="auto-type"></span>
-							</h3>
+							<p><span class="auto-type"></span></p>
 						</div>
 						<nav>
 							<ul>
@@ -36,17 +35,170 @@
 		<script src="//code.mattvenables.com/safe-target-blank/safe-target-blank.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
 		<script>
-			var typed = new Typed(".auto-type",{
-				strings: ["Aspiring Entrepreneur", "Finance Enthusiast", "Student"],
-				typeSpeed: 75,
-				backSpeed: 100,
-				loop:true
-			})
-		</script>
-		<script>
-			window.onload = function() { document.body.classList.remove('is-preload'); }
-			window.ontouchmove = function() { return false; }
-			window.onorientationchange = function() { document.body.scrollTop = 0; }
+(function() {
+  document.body.classList.remove('is-preload');
+
+  var BOOT_LINES = [
+    [300,  '> SYSTEM BOOT v1.0.0'],
+    [200,  '> Initializing portfolio core............. OK'],
+    [300,  '> Loading modules........................ OK'],
+    [400,  '> Compiling experience.ts................ OK'],
+    [300,  '> Fetching projects.....................'],
+    [150,  '  \u251C\u2500 finance-tracker \u2713'],
+    [150,  '  \u251C\u2500 portfolio-site \u2713'],
+    [150,  '  \u2514\u2500 side-projects \u2713'],
+    [400,  '> Establishing connection................ OK'],
+    [200,  '> All systems nominal'],
+    [300,  '> READY']
+  ];
+
+  var GLYPH_POOL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!?<>+=';
+  var SCRAMBLE_CYCLES = 8;
+  var SCRAMBLE_INTERVAL = 40;
+  var CHAR_STAGGER = 120;
+
+  var overlay = document.createElement('div');
+  overlay.id = 'intro-overlay';
+
+  var terminal = document.createElement('div');
+  terminal.id = 'intro-terminal';
+
+  var doorLeft = document.createElement('div');
+  doorLeft.className = 'intro-door intro-door-left';
+
+  var doorRight = document.createElement('div');
+  doorRight.className = 'intro-door intro-door-right';
+
+  overlay.appendChild(terminal);
+  overlay.appendChild(doorLeft);
+  overlay.appendChild(doorRight);
+  document.body.prepend(overlay);
+
+  function runBootSequence() {
+    return new Promise(function(resolve) {
+      var lineIndex = 0;
+
+      function showNextLine() {
+        if (lineIndex >= BOOT_LINES.length) {
+          var lines = terminal.querySelectorAll('div');
+          var lastLine = lines[lines.length - 1];
+          if (lastLine) {
+            var cursor = document.createElement('span');
+            cursor.className = 'cursor';
+            cursor.textContent = '\u2588';
+            lastLine.appendChild(cursor);
+          }
+          setTimeout(resolve, 400);
+          return;
+        }
+
+        var pair = BOOT_LINES[lineIndex];
+        var delay = pair[0];
+        var text = pair[1];
+        lineIndex++;
+
+        setTimeout(function() {
+          var line = document.createElement('div');
+          line.textContent = text;
+          terminal.appendChild(line);
+          showNextLine();
+        }, delay);
+      }
+
+      showNextLine();
+    });
+  }
+
+  function openDoors() {
+    return new Promise(function(resolve) {
+      terminal.style.opacity = '0';
+
+      setTimeout(function() {
+        doorLeft.classList.add('open');
+        doorRight.classList.add('open');
+
+        setTimeout(function() {
+          overlay.remove();
+          resolve();
+        }, 1300);
+      }, 200);
+    });
+  }
+
+  function scrambleReveal(el, text) {
+    return new Promise(function(resolve) {
+      var chars = text.split('');
+      var spans = [];
+
+      el.textContent = '';
+      for (var i = 0; i < chars.length; i++) {
+        var span = document.createElement('span');
+        if (chars[i] === ' ') {
+          span.textContent = '\u00A0';
+        } else {
+          span.textContent = '\u00A0';
+          span.style.color = '#999';
+        }
+        el.appendChild(span);
+        spans.push(span);
+      }
+
+      document.getElementById('header').style.opacity = '1';
+
+      var resolved = 0;
+      var total = chars.filter(function(c) { return c !== ' '; }).length;
+
+      for (var ci = 0; ci < chars.length; ci++) {
+        (function(charIndex) {
+          if (chars[charIndex] === ' ') return;
+
+          var startDelay = charIndex * CHAR_STAGGER;
+
+          setTimeout(function() {
+            var cycle = 0;
+
+            var interval = setInterval(function() {
+              if (cycle < SCRAMBLE_CYCLES) {
+                var glyph = GLYPH_POOL[Math.floor(Math.random() * GLYPH_POOL.length)];
+                spans[charIndex].textContent = glyph;
+                cycle++;
+              } else {
+                clearInterval(interval);
+                spans[charIndex].textContent = chars[charIndex];
+                spans[charIndex].style.color = '#fff';
+                resolved++;
+                if (resolved === total) {
+                  resolve();
+                }
+              }
+            }, SCRAMBLE_INTERVAL);
+          }, startDelay);
+        })(ci);
+      }
+    });
+  }
+
+  runBootSequence()
+    .then(function() { return openDoors(); })
+    .then(function() {
+      var h1 = document.querySelector('#header h1');
+      var originalText = h1.textContent;
+      return scrambleReveal(h1, originalText);
+    })
+    .then(function() {
+      new Typed('.auto-type', {
+        strings: ['Aspiring Entrepreneur', 'Finance Enthusiast', 'Student'],
+        typeSpeed: 75,
+        backSpeed: 100,
+        loop: true
+      });
+
+      document.body.classList.add('intro-done');
+    });
+
+  window.ontouchmove = function() { return false; };
+  window.onorientationchange = function() { document.body.scrollTop = 0; };
+})();
 		</script>
 
 
