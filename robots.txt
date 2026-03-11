@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://limzhengjie.github.io/sitemap.xml
