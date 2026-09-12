@@ -8,6 +8,8 @@
     [200, "> Initializing research core............. OK"],
     [300, "> Loading data modules................... OK"],
     [400, "> Compiling markets.ts................... OK"],
+    [250, "> Keen on investing and building......... OK"],
+    [250, "> FinTech, Data, Engineering and AI...... OK"],
     [300, "> Fetching datasets......................"],
     [150, "  \u251C\u2500 markets \u2713"],
     [150, "  \u251C\u2500 writing \u2713"],
@@ -194,7 +196,7 @@
     setTimeout(function () {
       document.documentElement.classList.remove("boot");
       document.documentElement.classList.remove("intro-done");
-    }, 1400);
+    }, 2000);
   }
 
   runBootSequence()

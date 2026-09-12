@@ -1,6 +1,6 @@
 # limzhengjie.github.io
 
-Personal site for **Lim Zheng Jie** — data and research at Artemis.
+Personal site for **Zheng Jie Lim** — data and research at Artemis.
 
 v1 is a single static homepage (`/`) for GitHub Pages. No build step.
 
