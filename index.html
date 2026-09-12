@@ -4,16 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Lim Zheng Jie — Data &amp; Research at Artemis</title>
+    <title>Zheng Jie Lim — Data &amp; Research at Artemis</title>
     <meta
       name="description"
       content="Data and research at Artemis. Markets work, writing, and builds."
     />
     <meta
       name="keywords"
-      content="Lim Zheng Jie, Zheng Jie, data, research, Artemis, markets"
+      content="Zheng Jie Lim, Lim Zheng Jie, Zheng Jie, data, research, Artemis, markets, FinTech"
     />
-    <meta name="author" content="Lim Zheng Jie" />
+    <meta name="author" content="Zheng Jie Lim" />
+    <meta name="robots" content="index, follow" />
 
     <!--
       Canonical is github.io for v1.
@@ -23,7 +24,7 @@
     -->
     <link rel="canonical" href="https://limzhengjie.github.io/" />
 
-    <meta property="og:title" content="Lim Zheng Jie — Data &amp; Research at Artemis" />
+    <meta property="og:title" content="Zheng Jie Lim — Data &amp; Research at Artemis" />
     <meta
       property="og:description"
       content="Data and research at Artemis. Markets work, writing, and builds."
@@ -31,17 +32,18 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://limzhengjie.github.io/" />
     <meta property="og:image" content="https://limzhengjie.github.io/og-image.png" />
-    <meta property="og:site_name" content="Lim Zheng Jie" />
+    <meta property="og:site_name" content="Zheng Jie Lim" />
     <meta property="og:locale" content="en_US" />
 
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Lim Zheng Jie — Data &amp; Research at Artemis" />
+    <meta name="twitter:title" content="Zheng Jie Lim — Data &amp; Research at Artemis" />
     <meta
       name="twitter:description"
       content="Data and research at Artemis. Markets work, writing, and builds."
     />
     <meta name="twitter:url" content="https://limzhengjie.github.io/" />
     <meta name="twitter:image" content="https://limzhengjie.github.io/og-image.png" />
+    <meta name="twitter:creator" content="@zhengjielimm" />
 
     <meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)" />
@@ -50,17 +52,27 @@
     <link rel="icon" type="image/png" href="/favicon-192.png" sizes="192x192" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="assets/css/site.css" />
+    <script>
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("boot");
+      }
+    </script>
 
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Person",
-        "name": "Lim Zheng Jie",
+        "name": "Zheng Jie Lim",
+        "alternateName": ["Lim Zheng Jie", "Zheng Jie"],
+        "givenName": "Zheng Jie",
+        "familyName": "Lim",
         "url": "https://limzhengjie.github.io/",
         "sameAs": [
           "https://www.linkedin.com/in/limzhengjie/",
           "https://github.com/limzhengjie",
-          "https://learntoinvests.com/"
+          "https://learntoinvests.com/",
+          "https://x.com/zhengjielimm",
+          "https://substack.com/@zhengjielimm"
         ],
         "jobTitle": "Data and Research",
         "worksFor": {
@@ -74,30 +86,66 @@
   </head>
   <body>
     <main>
-      <p class="name">Lim Zheng Jie</p>
-      <h1>Data and research @ Artemis</h1>
-      <p class="lede">Markets, writing, and builds.</p>
-      <nav aria-label="Links">
+      <header>
+        <p class="name">Zheng Jie Lim</p>
+        <h1>Data and research @ Artemis</h1>
+        <p class="lede">Keen on investing and building</p>
+        <p class="lede lede-alt">FinTech, Data, Engineering and AI</p>
+      </header>
+      <nav aria-label="Profile links">
         <ul>
           <li>
-            <a href="https://learntoinvests.com/" rel="noopener noreferrer" target="_blank">Blog</a>
+            <a
+              href="https://learntoinvests.com/"
+              rel="noopener noreferrer"
+              target="_blank"
+              aria-label="Blog"
+              >Blog</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://x.com/zhengjielimm"
+              rel="noopener noreferrer"
+              target="_blank"
+              aria-label="X"
+              >X</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://substack.com/@zhengjielimm"
+              rel="noopener noreferrer"
+              target="_blank"
+              aria-label="Substack"
+              >Substack</a
+            >
           </li>
           <li>
             <a
               href="https://www.linkedin.com/in/limzhengjie/"
               rel="noopener noreferrer"
               target="_blank"
+              aria-label="LinkedIn"
               >LinkedIn</a
             >
           </li>
           <li>
-            <a href="https://github.com/limzhengjie" rel="noopener noreferrer" target="_blank">GitHub</a>
+            <a
+              href="https://github.com/limzhengjie"
+              rel="noopener noreferrer"
+              target="_blank"
+              aria-label="GitHub"
+              >GitHub</a
+            >
           </li>
           <li>
-            <a href="mailto:limzhengjiework@gmail.com">Email</a>
+            <a href="mailto:limzhengjiework@gmail.com" aria-label="Email">Email</a>
           </li>
         </ul>
       </nav>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="assets/js/intro.js"></script>
   </body>
 </html>
