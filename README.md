@@ -4,6 +4,8 @@ Personal site for **Lim Zheng Jie** — data and research at Artemis.
 
 v1 is a single static homepage (`/`) for GitHub Pages. No build step.
 
+The homepage plays the restored terminal boot intro, then reveals the quiet identity (name, H1, links). `prefers-reduced-motion` skips the animation.
+
 ## Custom domain
 
 Canonical, Open Graph, Twitter, and schema `Person.url` currently use `https://limzhengjie.github.io/`.

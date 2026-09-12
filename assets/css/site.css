@@ -139,3 +139,151 @@ nav a:focus-visible {
     gap: 0.85rem;
   }
 }
+
+/* Intro overlay — restored from the pre-redesign boot sequence */
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translate3d(0, 1em, 0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+html.boot .name,
+html.boot h1,
+html.boot .lede,
+html.boot nav li {
+  opacity: 0;
+}
+
+html.boot .name.is-revealing,
+html.boot h1.is-revealing {
+  opacity: 1;
+}
+
+html.boot:not(.intro-done) nav {
+  opacity: 0;
+}
+
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  overflow: hidden;
+}
+
+#intro-terminal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  color: #00ff88;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.8rem;
+  line-height: 1.8;
+  transition: opacity 200ms ease;
+  z-index: 1;
+  text-align: left;
+  white-space: pre-wrap;
+}
+
+#intro-terminal .cursor {
+  animation: blink 0.7s step-end infinite;
+}
+
+.typed-cursor {
+  font-weight: 400;
+  animation: blink 0.7s step-end infinite;
+}
+
+.intro-door {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  background: #000;
+  transition: transform 1200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.intro-door-left {
+  left: 0;
+}
+
+.intro-door-right {
+  right: 0;
+}
+
+.intro-door-left.open {
+  transform: translateX(-100%);
+}
+
+.intro-door-right.open {
+  transform: translateX(100%);
+}
+
+html.intro-done .lede {
+  animation: fadeIn 0.45s ease forwards;
+}
+
+html.intro-done nav li {
+  animation: slideUp 0.5s ease-in-out forwards;
+}
+
+html.intro-done nav li:nth-child(1) {
+  animation-delay: 0s;
+}
+
+html.intro-done nav li:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+html.intro-done nav li:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+html.intro-done nav li:nth-child(4) {
+  animation-delay: 0.75s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.boot .name,
+  html.boot h1,
+  html.boot .lede,
+  html.boot nav,
+  html.intro-done .lede,
+  html.intro-done nav li {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+
+  #intro-overlay {
+    display: none;
+  }
+}
