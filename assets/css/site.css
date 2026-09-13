@@ -120,6 +120,24 @@ h1 {
   margin-top: 0.45rem;
 }
 
+.about a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--fg) 30%, transparent);
+  text-underline-offset: 0.18em;
+}
+
+.about a:hover {
+  text-decoration-color: var(--fg);
+}
+
+.about a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 nav {
   margin-top: 2rem;
   padding-top: 1.35rem;
