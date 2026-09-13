@@ -4,7 +4,7 @@ The site should help people find Zheng Jie Lim and his research on crypto, finte
 
 ## September 13, 2026 audit
 
-Technical eligibility is verified; Google's actual indexing and ranking are not yet verified. Public HTTP requests returned the following results:
+Technical eligibility is verified. Search Console confirms the homepage is indexed; the remaining URLs are being checked individually. Rankings are not established by this audit. Public HTTP requests returned the following results:
 
 | Page | HTTP | Canonical and indexing policy |
 | --- | --- | --- |
@@ -26,7 +26,7 @@ The expanded checks run before publishing. They catch missing sitemap entries, a
 
 Browser QA also reproduced a WebKit navigation race: the 150ms preload timer could fire after native navigation started but before `pagehide`. The navigation helper now cancels queued and in-flight work at departure, releases its temporary unload guard when idle, and resumes warming after a back/forward-cache restore. A regression observes late fetches during a delayed document response. The previously unversioned navigation script now has a content hash across every page, so existing visitors fetch the fix.
 
-The approved full-screen introduction lasts about six seconds on a first visit, with immediate X/Escape dismissal and reduced-motion bypass. It intentionally delays seeing the homepage. Biography, navigation and portrait remain in the initial HTML and work without JavaScript. This is an intentional experience tradeoff, not a performance optimization or proof of good field Core Web Vitals. No verified Search Console/Chrome User Experience Report performance data is available in this audit.
+The approved full-screen introduction lasts about six seconds on a first visit, with immediate X/Escape dismissal and reduced-motion bypass. It intentionally delays seeing the homepage. Biography, navigation and portrait remain in the initial HTML and work without JavaScript. This is an intentional experience tradeoff, not a performance optimization or proof of good field Core Web Vitals. Search Console reports insufficient usage data for both mobile and desktop in the last 90 days. Mobile Lighthouse 12.8.2 lab audits scored Home 99 performance and Writing/Designs 100. All three scored 100 for accessibility, best practices and SEO, with zero total blocking time and effectively zero layout shift. These single-run lab results are not field Core Web Vitals or a guarantee of every visitor’s experience.
 
 ## Publishing rules
 
@@ -39,15 +39,31 @@ The approved full-screen introduction lasts about six seconds on a first visit, 
 - Run the test suite and browser checks before publishing. The SEO tests cover sitemap pages, Projects and the 404 page; the browser suite includes both themes and 200% text.
 - Prefer specific, natural topic language to keyword repetition. Extra schema fields and word count alone do not establish expertise or guarantee search features.
 
-## Search Console: account step still required
+## Search Console: verified on September 13, 2026
 
-Automated access to the signed-in browser failed again during this audit because the browser tool's sandbox could not initialize. No Search Console connector is available. No property verification, sitemap submission or indexing request has been verified or completed. A public search-tool check did not surface results for the exact domain, but that tool is not Search Console and an empty `site:` query cannot establish that a page is absent from Google's index.
+The signed-in Search Console domain property confirms verified ownership, valid robots.txt files and a property-added date of September 13, 2026. The built-in browser tool could not initialize, so these checks used Chrome's normal macOS accessibility interface. No browser security setting or verification token was changed.
 
-1. Open the verified property for limzhengjie.com in [Google Search Console](https://search.google.com/search-console). If none exists, verify a domain property using the DNS TXT record Google supplies, or verify the HTTPS URL-prefix property using Google's supplied HTML file or meta tag. Never invent a verification token.
-2. Submit `https://limzhengjie.com/sitemap.xml` in Sitemaps.
-3. Use URL Inspection on Home, Writing, Designs and the four new infographic pages. Check Google's selected canonical, crawl access and indexing status. Request indexing for the new pages where appropriate.
-4. Record each page's indexed/not-indexed verdict, last crawl date, Google-selected canonical and any exclusion reason. The URL Inspection live test establishes current accessibility; it does not replace the indexed-version verdict.
-5. Once data accumulates, use Performance to inspect branded queries, research-topic queries, clicks and impressions. Review Page Indexing and Core Web Vitals for actual issues. Deployment and valid markup do not guarantee indexing, rankings or rich results. Requests can take days or weeks; repeating them does not accelerate crawling.
+The sitemap was resubmitted successfully. Its discovered-page count increased from one to all seven canonical pages. Discovery is not the same as indexing. The overview's Page Indexing and Performance reports are still processing.
+
+URL Inspection confirms the homepage is on Google, with a successful smartphone crawl on September 13, 2026 at 01:16:07 (as displayed by Search Console). Crawling and indexing are allowed, and Google selected the inspected HTTPS homepage as canonical. A fresh indexing request was accepted for the homepage. Writing is discovered but not yet indexed, with no recorded crawl or Google-selected canonical.
+
+Use URL Inspection to check the other pages' actual indexing verdicts. Keep Projects excluded while it is a placeholder. Requests can take days or weeks; repeating them does not accelerate crawling. Record new results when Google updates its reports rather than treating successful deployment or sitemap discovery as proof of indexing.
+
+## Research notes and measurement
+
+Each infographic detail page now includes linked primary references, explanations of displayed calculations and contextual links to related work. The original data dates and images remain intact. The notes distinguish current documentation from historical source data; no underlying dataset has been reconstructed or represented as newly verified.
+
+The revenue-per-employee notes explicitly flag the OnlyFans row's arithmetic mismatch and the difference between Anthropic's company-reported year-end run-rate and the graphic's estimate. AI notes distinguish whole-population estimates from working-age adoption and developer surveys. CXMT notes explain the opening-price denominator. x402 notes distinguish payments, buyers, merchants and volume, and identify the unspecified weighting of the historical mix percentages.
+
+Mobile lab baseline (Lighthouse 12.8.2, simulated mobile throttling, fresh isolated browser profiles, September 13, 2026):
+
+| Page | Performance | Accessibility / Best practices / SEO | LCP | TBT | CLS |
+| --- | --- | --- | --- | --- | --- |
+| Home | 99 | 100 / 100 / 100 | 1.6 s | 0 ms | <0.001 |
+| Writing | 100 | 100 / 100 / 100 | 0.9 s | 0 ms | 0 |
+| Designs | 100 | 100 / 100 / 100 | 1.1 s | 0 ms | 0 |
+
+Lighthouse flagged the homepage portrait's image-delivery size and GitHub Pages' short asset cache lifetime. The original portrait resolution is intentional and the six-second intro is approved. The approved portrait and intro are preserved. Lab LCP does not measure the full time spent in the intro. Field interaction quality remains unmeasured until enough real-user data is available.
 
 ## Growth after the technical work
 

@@ -131,13 +131,19 @@
         <p class="design-date">Zheng Jie Lim · Artemis · Data as of <time datetime="2026-05-05">5 May 2026</time></p>
         <a class="design-open" href="/assets/designs/agentic-payments.png" aria-labelledby="design-title"><img alt="Two pie charts showing the reported x402 settlement mix: 82.1 percent on Base and 99.8 percent in USDC, as of May 5, 2026." class="design-preview" fetchpriority="high" height="900" sizes="(min-width: 1040px) 1000px, calc(100vw - 40px)" src="/assets/designs/agentic-payments-800.webp" srcset="/assets/designs/agentic-payments-800.webp 800w, /assets/designs/agentic-payments-1600.webp 1600w" width="1600"/></a>
         <div class="research-context">
-            <p>Which chains and stablecoins carry x402 payments? This infographic presents two views of the settlement mix: Base compared with other chains, and USDC compared with other stablecoins.</p>
-            <p>The charts sit alongside cumulative payment counts, payment volume and merchant figures in the original artwork. Together, they show the concentration of settlement infrastructure in the source’s x402 dataset.</p>
-          <h2>Sources and context</h2>
-          <p>The snapshot is dated 5 May 2026, with cumulative totals described as starting in October 2025. Its figures refer to the source’s observed x402 activity; they do not measure all AI-agent commerce or all stablecoin payments.</p>
-          <p>Source credits in the original: Artemis.</p>
-          <p><a href="/assets/designs/agentic-payments.png">View the original infographic and source notes</a>.</p>
-          <p><a href="/writing/">More research and writing</a></p>
+          <p>This May 5, 2026 snapshot shows the settlement mix of observed x402 payments: 82.1% on Base and 99.8% in USDC. The original reports 178.7 million payments and $42.4 million transferred across more than 5,000 merchants since October 2025.</p>
+          <h2>What the concentration tells us</h2>
+          <p>An open payment standard can still have concentrated usage. In this snapshot, most of the observed activity uses one chain and one stablecoin. That describes the infrastructure participants used; it does not mean the protocol requires that combination.</p>
+          <p>The <a href="https://www.x402.org/x402-whitepaper.pdf">original x402 whitepaper</a> describes an HTTP payment flow: a service requests payment with a 402 response, and a client pays to access the resource. It is designed to support different chains and tokens.</p>
+          <h2>Reading the activity figures</h2>
+          <p>Dividing the displayed $42.4 million by 178.7 million payments gives a mean payment of about $0.24. This is an average across the reported totals, not the median purchase or spending per user. Transactions, buyers and merchants measure different things; a payment count alone does not establish how many autonomous agents made useful purchases.</p>
+          <p>The chart’s percentages should be read as the original settlement-mix figures. The artwork does not specify whether those shares are weighted by transaction count or dollar volume, so they should not be relabelled as either without the underlying dataset.</p>
+          <h2>Source and scope</h2>
+          <p>The original source is Artemis. Its <a href="https://www.artemis.ai/sectors/agentic-payments/data">agentic payments dashboard</a> provides current metrics for transactions, volume, buyers and sellers, including separate real and gamed activity measures. Current definitions and coverage may differ from this historical snapshot.</p>
+          <p>These figures cover the source’s observed x402 activity. They are not a total for all AI-agent commerce or all stablecoin payments.</p>
+          <p>Related: <a href="/designs/ai-adoption/">AI adoption and the difference between reach and depth</a>.</p>
+          <p><a href="/assets/designs/agentic-payments.png">View the original infographic</a> · <a href="/writing/">More writing</a></p>
+          <p>Notes reviewed <time datetime="2026-09-13">13 September 2026</time>.</p>
         </div>
       </article>
     </main>
