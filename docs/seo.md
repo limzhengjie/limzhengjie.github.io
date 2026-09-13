@@ -17,6 +17,7 @@ The next layer of work adds a page per research infographic, with a topic-specif
 - Put actual data dates, estimates and reporting limitations near research graphics. Do not present a historical graphic as current data.
 - Include original image links, descriptive alt text and compressed responsive previews. Add the page and image to the sitemap.
 - Update lastmod when content changes, not on every scheduled run. The writing sync preserves unrelated sitemap entries.
+- Projects is a "Coming soon" placeholder, with `noindex, follow` and no sitemap entry. Add useful project content before removing `noindex` and adding its canonical URL to the sitemap.
 - Run the test suite and browser checks before publishing. The SEO tests cover every page listed in the sitemap.
 - Prefer specific, natural topic language to keyword repetition. Extra schema fields and word count alone do not establish expertise or guarantee search features.
 

@@ -40,7 +40,7 @@ jobs:
         run: |
           mkdir _site
           cp index.html robots.txt sitemap.xml CNAME favicon.ico favicon-192.png favicon-512.png apple-touch-icon.png og-image.png _site/
-          cp -R assets writing designs _site/
+          cp -R assets writing designs projects _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

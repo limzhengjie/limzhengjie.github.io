@@ -1,20 +1,42 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --bg: #f6f4ef;
   --fg: #1c1b18;
   --muted: #5c5a54;
   --rule: #d8d4cb;
   --focus: #1c1b18;
+  --brand-filter: none;
+  --lamp-shade: #302e29;
+  --lamp-bulb: #e4ba75;
+  --lamp-glow: 0.45;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --bg: #141413;
     --fg: #eeebe4;
     --muted: #b0aca3;
     --rule: #3a3934;
     --focus: #eeebe4;
+    --brand-filter: invert(1);
+    --lamp-shade: #777166;
+    --lamp-bulb: #858075;
+    --lamp-glow: 0;
   }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141413;
+  --fg: #eeebe4;
+  --muted: #b0aca3;
+  --rule: #3a3934;
+  --focus: #eeebe4;
+  --brand-filter: invert(1);
+  --lamp-shade: #777166;
+  --lamp-bulb: #858075;
+  --lamp-glow: 0;
 }
 
 *,
@@ -69,6 +91,7 @@ header {
   display: block;
   width: 100%;
   height: 100%;
+  filter: var(--brand-filter);
 }
 
 .brand-mark:focus-visible {
@@ -76,10 +99,65 @@ header {
   outline-offset: 5px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .brand-mark img {
-    filter: invert(1);
+.theme-lamp {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  right: max(env(safe-area-inset-right), clamp(0.65rem, 3vw, 2.75rem));
+  width: 56px;
+  height: 104px;
+  padding: 0;
+  border: 0;
+  border-radius: 0 0 6px 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.theme-lamp svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.theme-lamp:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.lamp-shade {
+  fill: var(--lamp-shade);
+}
+
+.lamp-bulb {
+  fill: var(--lamp-bulb);
+}
+
+.lamp-glow {
+  fill: #e4ba75;
+  opacity: var(--lamp-glow);
+  filter: blur(7px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lamp-fixture {
+    transform-origin: 28px 0;
+    transition: transform 180ms ease;
   }
+
+  .theme-lamp:active .lamp-fixture {
+    transform: rotate(4deg);
+  }
+}
+
+.projects-placeholder {
+  margin: 4rem 0;
+  text-align: center;
+  color: var(--muted);
+  font: 0.95rem/1.6 "Avenir Next", "Segoe UI", sans-serif;
 }
 
 .name {
@@ -257,6 +335,10 @@ body.page-writing {
   padding: 0.65rem 0.35rem;
   color: var(--muted);
   text-decoration-color: transparent;
+}
+
+.site-nav ul {
+  column-gap: clamp(0.25rem, 2vw, 1.35rem);
 }
 
 .site-nav a[aria-current="page"] {
