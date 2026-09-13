@@ -26,7 +26,9 @@ The lowest measured HTML text contrast in the initial audit was 6.27:1. Text was
 
 ## First-visit introduction
 
-The homepage shows a 1.9-second terminal-style introduction once per browser storage profile. Main content and navigation are usable throughout. Skip and Escape dismiss it; reduced-motion users skip it. If persistent storage is blocked, it uses session storage, then skips the intro if both are unavailable. The portrait is the supplied original JPEG, framed using CSS; the source image is unchanged.
+The homepage shows a full-screen terminal-style introduction once per browser storage profile. Its three lines type over six seconds, then the screen fades away in 180 ms. The native modal keeps the underlying homepage out of the keyboard order during the introduction. X and Escape remove it immediately and focus the homepage; reduced-motion users skip it. If persistent storage is blocked, it uses session storage, then skips the intro if both are unavailable. The portrait is the supplied original JPEG, framed using CSS; the source image is unchanged.
+
+The browser suite checks full viewport coverage, centred text, duration, focus containment, synchronous X dismissal, Escape, automatic completion, restored scrolling and no replay. The focus regression also covers Safari activation when focus was in browser chrome.
 
 The lamp sways gently and gives a stronger, brief swing when clicked or tapped. Both movements are disabled with reduced motion. Browser regressions check the pull response, return to the idle sway, and reduced-motion behavior.
 

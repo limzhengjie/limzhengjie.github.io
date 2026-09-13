@@ -122,41 +122,74 @@ header {
   transform: scale(2.8);
 }
 
+/* A short first-visit screen; the native dialog keeps the page beneath it inert. */
+body:has(> .site-boot[open]) {
+  overflow: hidden;
+}
+
 .site-boot {
   position: fixed;
-  z-index: 20;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(280px, calc(100% - 2rem));
-  padding: 0.5rem 1rem 1rem;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 2rem 1.5rem;
+  border: 0;
   background: var(--bg);
   color: var(--fg);
-  box-shadow: 0 8px 32px rgb(0 0 0 / 8%);
-  font: 12px/1.6 ui-monospace, "SFMono-Regular", Consolas, monospace;
+  overscroll-behavior: contain;
+  font: 14px/1.9 ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+
+.site-boot[open] {
+  display: grid;
+  place-items: center;
+}
+
+.site-boot::backdrop {
+  background: transparent;
+}
+
+.boot-console {
+  width: min(28rem, 100%);
 }
 
 .boot-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  margin: 0 0 1rem;
   color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.boot-name {
+  margin: 0 0 2rem;
+  font: 500 clamp(2rem, 6vw, 2.75rem)/1.2 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  letter-spacing: -0.03em;
 }
 
 .boot-skip {
+  position: absolute;
+  top: max(1.25rem, env(safe-area-inset-top));
+  right: max(1.25rem, env(safe-area-inset-right));
   min-width: 44px;
   min-height: 44px;
-  margin-right: -0.75rem;
+  padding: 0;
   border: 0;
   border-radius: 3px;
   background: transparent;
-  color: var(--fg);
+  color: var(--muted);
   font-family: inherit;
-  font-size: 20px;
+  font-size: 24px;
   line-height: 1;
   cursor: pointer;
+  touch-action: manipulation;
+}
+
+.boot-skip:hover {
+  color: var(--fg);
 }
 
 .boot-skip:focus-visible {
@@ -165,11 +198,48 @@ header {
 }
 
 .boot-lines {
-  min-height: 4.8em;
+  min-height: 7.2em;
   margin: 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font: inherit;
+}
+
+.boot-lines::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 0.3em;
+  background: var(--muted);
+  vertical-align: -0.1em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .boot-console {
+    animation: boot-arrive 450ms ease-out both;
+  }
+
+  .boot-lines::after {
+    animation: boot-cursor 1s steps(1) infinite;
+  }
+
+  .site-boot.is-finishing {
+    opacity: 0;
+    transition: opacity 180ms ease-out;
+  }
+}
+
+@keyframes boot-arrive {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes boot-cursor {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 
 .theme-lamp {
