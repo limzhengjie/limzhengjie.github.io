@@ -142,15 +142,17 @@ class SiteTests(unittest.TestCase):
             w.validate(self.articles + [self.articles[0]])
 
     def test_navigation_and_designs_indexing(self):
-        for path, current in [('index.html', '/'), ('writing/index.html', '/writing/'), ('designs/index.html', '/designs/')]:
+        for path, current in [('index.html', '/'), ('writing/index.html', '/writing/'), ('designs/index.html', '/designs/'), ('projects/index.html', '/projects/')]:
             tags = Elements((w.ROOT / path).read_text()).tags
             links = [a for t, a in tags if t == 'a']
-            self.assertTrue({'/', '/writing/', '/designs/'}.issubset({a.get('href') for a in links}))
+            self.assertTrue({'/', '/writing/', '/designs/', '/projects/'}.issubset({a.get('href') for a in links}))
             self.assertEqual([a['href'] for a in links if a.get('aria-current') == 'page'], [current])
         designs = (w.ROOT / 'designs/index.html').read_text()
         self.assertIn('content="index, follow, max-image-preview:large"', designs)
         self.assertNotIn('Coming soon.', designs)
         self.assertIn('/designs/', (w.ROOT / 'sitemap.xml').read_text())
+        self.assertIn('content="noindex, follow"', (w.ROOT / 'projects/index.html').read_text())
+        self.assertNotIn('/projects/', (w.ROOT / 'sitemap.xml').read_text())
 
     def test_sitemap_date_changes_only_for_writing(self):
         xml = (w.ROOT / 'sitemap.xml').read_text()
