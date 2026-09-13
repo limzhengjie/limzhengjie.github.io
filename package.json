@@ -2,7 +2,7 @@
   "name": "zheng-jie-personal-site",
   "private": true,
   "scripts": {
-    "test:browser": "node tests/browser/theme.cjs"
+    "test:browser": "node tests/browser/theme.cjs && node tests/browser/navigation.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"
