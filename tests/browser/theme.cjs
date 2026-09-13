@@ -41,16 +41,21 @@ async function run() {
         executablePath: process.env[`${engine.toUpperCase()}_EXECUTABLE_PATH`] || undefined,
       });
       try {
-        const welcome = await browser.newContext({ viewport: { width: 390, height: 844 }, colorScheme: 'dark', reducedMotion: 'no-preference' });
+        const welcome = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, colorScheme: 'dark', reducedMotion: 'no-preference' });
         const home = await welcome.newPage();
         await home.goto(base + '/', { waitUntil: 'domcontentloaded' });
         await home.locator('.site-boot').waitFor();
         assert.equal(await home.locator('.about').evaluate(e => getComputedStyle(e).opacity), '1');
         assert.ok(await home.locator('.site-nav').isVisible());
         await home.locator('.profile-portrait img').evaluate(e => e.decode());
+        assert.ok(await home.locator('.profile-portrait img').evaluate(e =>
+          e.naturalWidth >= e.getBoundingClientRect().width * devicePixelRatio), 'portrait has enough source pixels for a 3× display');
         assert.equal(await home.locator('.profile-portrait img').evaluate(e => getComputedStyle(e).filter), 'none');
         await home.locator('.theme-lamp').click();
         await expectTheme(home, 'light');
+        assert.equal(await home.locator('.lamp-fixture').evaluate(e => getComputedStyle(e).animationName), 'lamp-pull');
+        await home.waitForFunction(() => !document.querySelector('.theme-lamp').classList.contains('is-pulled'));
+        assert.equal(await home.locator('.lamp-fixture').evaluate(e => getComputedStyle(e).animationName), 'lamp-sway');
         assert.equal(await home.locator('.profile-portrait img').evaluate(e => getComputedStyle(e).filter), 'none');
         await home.locator('.site-boot').waitFor({ state: 'detached', timeout: 4000 });
         await home.reload({ waitUntil: 'load' });
@@ -61,7 +66,11 @@ async function run() {
           const context = await browser.newContext({ reducedMotion });
           const page = await context.newPage();
           await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
-          if (reducedMotion === 'reduce') assert.equal(await page.locator('.site-boot').count(), 0);
+          if (reducedMotion === 'reduce') {
+            assert.equal(await page.locator('.site-boot').count(), 0);
+            await page.locator('.theme-lamp').click();
+            assert.equal(await page.locator('.lamp-fixture').evaluate(e => getComputedStyle(e).animationName), 'none');
+          }
           else {
             await page.getByRole('button', { name: 'Skip introduction' }).click();
             assert.equal(await page.locator('.site-boot').count(), 0);

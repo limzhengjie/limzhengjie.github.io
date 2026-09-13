@@ -114,7 +114,7 @@ header {
   height: 100%;
   object-fit: cover;
   object-position: center bottom;
-  transform: scale(3);
+  transform: scale(2.8);
 }
 
 .site-boot {
@@ -212,12 +212,25 @@ header {
 @media (prefers-reduced-motion: no-preference) {
   .lamp-fixture {
     transform-origin: 28px 0;
-    transition: transform 180ms ease;
+    animation: lamp-sway 3.6s ease-in-out infinite;
   }
 
-  .theme-lamp:active .lamp-fixture {
-    transform: rotate(4deg);
+  .theme-lamp.is-pulled .lamp-fixture {
+    animation: lamp-pull 750ms ease-out;
   }
+}
+
+@keyframes lamp-sway {
+  0%, 50%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  75% { transform: rotate(-5deg); }
+}
+
+@keyframes lamp-pull {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(12deg); }
+  55% { transform: rotate(-8deg); }
+  80% { transform: rotate(4deg); }
 }
 
 .projects-placeholder {

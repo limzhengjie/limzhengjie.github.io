@@ -48,6 +48,11 @@
           <path d="M12 77h32" fill="none" stroke="var(--lamp-bulb)" stroke-width="1.5" stroke-linecap="round"/>
         </g>
       </svg>`;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    lamp.querySelector('.lamp-fixture').addEventListener('animationend', (event) => {
+      if (event.animationName === 'lamp-pull') lamp.classList.remove('is-pulled');
+    });
+    motion.addEventListener('change', () => lamp.classList.remove('is-pulled'));
     lamp.addEventListener('click', () => {
       savedTheme = root.dataset.theme === 'dark' ? 'light' : 'dark';
       try {
@@ -56,6 +61,12 @@
         // Keep the choice for this page even if it cannot be persisted.
       }
       applyTheme();
+      lamp.classList.remove('is-pulled');
+      if (!motion.matches) {
+        // Restart the pull response even if another tap arrives mid-swing.
+        void lamp.offsetWidth;
+        lamp.classList.add('is-pulled');
+      }
     });
     applyTheme();
     // Preserve the skip link as the first keyboard stop.

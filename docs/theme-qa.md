@@ -27,3 +27,7 @@ The lowest measured HTML text contrast in the initial audit was 6.27:1. Text was
 ## First-visit introduction
 
 The homepage shows a 1.9-second terminal-style introduction once per browser storage profile. Main content and navigation are usable throughout. Skip and Escape dismiss it; reduced-motion users skip it. If persistent storage is blocked, it uses session storage, then skips the intro if both are unavailable. The portrait is the supplied original JPEG, framed using CSS; the source image is unchanged.
+
+The lamp sways gently and gives a stronger, brief swing when clicked or tapped. Both movements are disabled with reduced motion. Browser regressions check the pull response, return to the idle sway, and reduced-motion behavior.
+
+The supplied portrait is 960×1280 (141,310 bytes), preserved byte-for-byte. Its 112px frame and 2.8× CSS crop retain enough source pixels for a 3× display, which the browser suite checks. The source is not a 4K image; increasing the file dimensions would not recover additional captured detail.
