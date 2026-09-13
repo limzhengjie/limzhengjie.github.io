@@ -1,0 +1,59 @@
+name: Publish website
+
+on:
+  push:
+    branches: [master]
+  schedule:
+    - cron: '23 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate the committed site
+        run: |
+          python3 -m unittest discover -s tests -v
+          python3 scripts/writing.py --check
+      - name: Fetch article metadata and compare with the last deployment
+        run: python3 scripts/writing.py --sync --published
+      - name: Validate the site before publishing
+        run: |
+          python3 -m unittest discover -s tests -v
+          python3 scripts/writing.py --check
+      - name: Package only public site files
+        run: |
+          mkdir _site
+          cp index.html robots.txt sitemap.xml CNAME favicon.ico favicon-192.png favicon-512.png apple-touch-icon.png og-image.png _site/
+          cp -R assets writing designs _site/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish validated artifact
+        id: deployment
+        uses: actions/deploy-pages@v4
