@@ -99,6 +99,73 @@ header {
   outline-offset: 5px;
 }
 
+.profile-portrait {
+  width: 112px;
+  height: 112px;
+  margin: 0 auto 1.25rem;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--rule);
+}
+
+.profile-portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  transform: scale(3);
+}
+
+.site-boot {
+  position: fixed;
+  z-index: 20;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: max(1rem, env(safe-area-inset-left));
+  width: min(280px, calc(100% - 2rem));
+  padding: 0.5rem 1rem 1rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 8%);
+  font: 12px/1.6 ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+
+.boot-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+}
+
+.boot-skip {
+  min-width: 44px;
+  min-height: 44px;
+  margin-right: -0.75rem;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.boot-skip:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.boot-lines {
+  min-height: 4.8em;
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+}
+
 .theme-lamp {
   position: fixed;
   z-index: 10;
@@ -473,6 +540,7 @@ body.page-writing {
 
 .design-detail .design-date {
   margin-top: 0.75rem;
+  white-space: normal;
 }
 
 .design-detail .design-open {
