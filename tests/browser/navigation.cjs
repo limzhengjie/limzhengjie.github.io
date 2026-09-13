@@ -142,6 +142,7 @@ async function run() {
         await page.waitForTimeout(1200);
         await page.locator('.site-nav a[href="/"]').click();
         await page.locator('.site-boot').waitFor();
+        await page.getByRole('button', { name: 'Skip introduction' }).click();
         await page.locator('.site-nav a[href="/writing/"]').click();
         assert.equal(await page.locator('.site-boot').count(), 0, 'intro removed on navigation');
         await page.locator('.site-nav a[href="/"]').click();

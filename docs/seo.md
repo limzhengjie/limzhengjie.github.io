@@ -8,7 +8,7 @@ Public checks confirmed that Home, Writing and Designs return HTTP 200, HTTP and
 
 A mobile-sized Chromium run with normal motion settings measured the biography becoming visible about 10.6 seconds after navigation because of the terminal intro. This is a one-run browser observation, not a field Core Web Vitals result. The blocking intro and external Typed.js dependency have been removed so the same HTML can render immediately.
 
-A later update restores a brief 1.9-second first-visit introduction alongside the visible page, with skip and reduced-motion support. The supplied portrait is in the homepage HTML and Person metadata. Neither feature hides or delays the biography and navigation.
+At the owner’s request, a later update adds a full-screen first-visit introduction lasting about six seconds, with immediate X/Escape dismissal and reduced-motion bypass. It intentionally covers the homepage until completion or dismissal. The biography, navigation and portrait remain in the initial HTML; without JavaScript the homepage is shown directly. The supplied portrait is also in Person metadata.
 
 The next layer of work adds a page per research infographic, with a topic-specific title and description, visible context, original source credits, dates, image and breadcrumb metadata, image sitemap entries, and links from the gallery captions. Clicking the images still opens the full-image viewer. Homepage metadata and biography now focus on the requested subjects, with consistent WebSite / ProfilePage / Person identity. Obsolete meta keywords have been removed.
 

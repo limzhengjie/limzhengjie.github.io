@@ -21,7 +21,11 @@ async function expectTheme(page, theme) {
 }
 
 async function expectCenteredIntro(page) {
-  const box = await page.locator('.site-boot').boundingBox();
+  const screen = await page.locator('.site-boot').boundingBox();
+  assert.ok(await page.locator('.site-boot').evaluate(e => e.matches(':modal')), 'startup must block interaction with the homepage');
+  assert.ok(Math.abs(screen.width - page.viewportSize().width) < 2 && Math.abs(screen.height - page.viewportSize().height) < 2, 'startup does not cover the viewport');
+  await page.locator('.boot-console').evaluate(e => Promise.all(e.getAnimations().map(a => a.finished)));
+  const box = await page.locator('.boot-console').boundingBox();
   const viewport = page.viewportSize();
   assert.ok(Math.abs(box.x + box.width / 2 - viewport.width / 2) < 2, 'startup is not horizontally centered');
   assert.ok(Math.abs(box.y + box.height / 2 - viewport.height / 2) < 2, 'startup is not vertically centered');
@@ -59,6 +63,20 @@ async function run() {
         assert.ok(await home.locator('.profile-portrait img').evaluate(e =>
           e.naturalWidth >= e.getBoundingClientRect().width * devicePixelRatio), 'portrait has enough source pixels for a 3× display');
         assert.equal(await home.locator('.profile-portrait img').evaluate(e => getComputedStyle(e).filter), 'none');
+        await home.waitForTimeout(3200);
+        assert.ok(await home.locator('.site-boot').isVisible(), 'startup ends before readers can see it');
+        assert.equal(await home.locator('.boot-skip').evaluate(e => e === document.activeElement), true);
+        for (let i = 0; i < 3; i++) {
+          await home.keyboard.press('Tab');
+          assert.ok(await home.evaluate(() => document.querySelector('.site-boot').contains(document.activeElement) ||
+            (document.activeElement === document.body && !document.hasFocus())), 'focus escaped to the homepage');
+        }
+        const skipped = await home.evaluate(() => {
+          document.querySelector('.boot-skip').click();
+          return { removed: !document.querySelector('.site-boot'), locked: getComputedStyle(document.body).overflow === 'hidden',
+            focus: document.activeElement === document.querySelector('main') };
+        });
+        assert.deepEqual(skipped, { removed: true, locked: false, focus: true }, 'X must reveal the homepage synchronously');
         await home.locator('.theme-lamp').click();
         await expectTheme(home, 'light');
         assert.equal(await home.locator('.lamp-fixture').evaluate(e => getComputedStyle(e).animationName), 'lamp-pull');
@@ -81,11 +99,25 @@ async function run() {
           }
           else {
             await expectCenteredIntro(page);
-            await page.getByRole('button', { name: 'Skip introduction' }).click();
+            await page.keyboard.press('Escape');
             assert.equal(await page.locator('.site-boot').count(), 0);
+            assert.equal(await page.locator('main').evaluate(e => e === document.activeElement), true);
           }
           await context.close();
         }
+
+        const automatic = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'light', reducedMotion: 'no-preference' });
+        const automaticPage = await automatic.newPage();
+        await automaticPage.goto(base + '/', { waitUntil: 'domcontentloaded' });
+        await expectCenteredIntro(automaticPage);
+        await automaticPage.waitForTimeout(3500);
+        assert.ok(await automaticPage.locator('.site-boot').isVisible(), 'startup should last longer than the old introduction');
+        await automaticPage.locator('.site-boot').waitFor({ state: 'detached', timeout: 5000 });
+        assert.equal(await automaticPage.locator('main').evaluate(e => e === document.activeElement), true);
+        assert.equal(await automaticPage.locator('body').evaluate(e => getComputedStyle(e).overflow === 'hidden'), false);
+        await automaticPage.reload({ waitUntil: 'load' });
+        assert.equal(await automaticPage.locator('.site-boot').count(), 0, 'automatic completion must not replay on reload');
+        await automatic.close();
 
         for (const initial of ['light', 'dark']) {
           const context = await browser.newContext({
@@ -98,6 +130,7 @@ async function run() {
             await page.setViewportSize({ width, height: 900 });
             for (const route of routes) {
               await page.goto(base + route, { waitUntil: 'load' });
+              if (await page.locator('.site-boot').count()) await page.getByRole('button', { name: 'Skip introduction' }).click();
               await expectTheme(page, initial);
               await page.locator('.theme-lamp').tap();
               await expectTheme(page, opposite(initial));
