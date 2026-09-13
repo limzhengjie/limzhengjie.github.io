@@ -57,6 +57,31 @@ header {
   margin: 0;
 }
 
+.brand-mark {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 1rem;
+  border-radius: 4px;
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.brand-mark:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 5px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .brand-mark img {
+    filter: invert(1);
+  }
+}
+
 .name {
   margin: 0;
   font-size: clamp(2rem, 6vw, 2.75rem);

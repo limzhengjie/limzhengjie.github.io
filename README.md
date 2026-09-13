@@ -4,7 +4,7 @@ Static personal website at [limzhengjie.com](https://limzhengjie.com/), publishe
 
 - `/`: biography, Home / Writing / Designs navigation and profile links.
 - `/writing/`: Artemis bylines first, then the latest 25 Learn To Invest articles.
-- `/designs/`: Coming soon. It is `noindex, follow` and omitted from the sitemap until real work is added.
+- `/designs/`: an infographic portfolio, currently Coming soon. It is `noindex, follow` and omitted from the sitemap until real work is added.
 
 The existing terminal intro remains on the homepage. Reduced-motion preferences skip it; Writing and Designs render without JavaScript.
 
