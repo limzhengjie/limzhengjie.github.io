@@ -2,6 +2,8 @@
   // Warm only our small HTML pages. An uncached click remains a normal link.
   const pages = new Map();
   const pending = new Map();
+  let leaving = false;
+  let warmTask = null;
   const maxAge = 60_000;
   const metadata = 'title, meta[name], meta[property], link[rel="canonical"], script[type="application/ld+json"]';
   let currentPath = location.pathname;
@@ -29,10 +31,11 @@
   }
 
   async function prefetch(url) {
-    if (!url || !canPrefetch() || cached(url) || pending.has(pageKey(url))) return;
+    if (leaving || !url || !canPrefetch() || cached(url) || pending.has(pageKey(url))) return;
     const key = pageKey(url);
     const controller = new AbortController();
     pending.set(key, controller);
+    window.addEventListener('beforeunload', stopPreloads);
     const timeout = setTimeout(() => controller.abort(), 5000);
     try {
       const response = await fetch(url, { credentials: 'same-origin', priority: 'low', signal: controller.signal });
@@ -43,7 +46,8 @@
       // Offline, blocked or failed preloads never prevent ordinary navigation.
     } finally {
       clearTimeout(timeout);
-      pending.delete(key);
+      if (pending.get(key) === controller) pending.delete(key);
+      releaseUnloadGuard();
     }
   }
 
@@ -56,7 +60,7 @@
     const html = cached(url);
     if (!html) return null;
     const next = new DOMParser().parseFromString(html, 'text/html');
-    if (!next.querySelector('main#main-content') || !next.querySelector('script[src="/assets/js/navigation.js"]')) return null;
+    if (!next.querySelector('main#main-content') || !next.querySelector('script[src^="/assets/js/navigation.js"]')) return null;
     // Different stylesheet/script URLs indicate a new build: let the browser load it.
     const assets = doc => [...doc.querySelectorAll('head script[src], link[rel="stylesheet"]')]
       .map(node => node.getAttribute('src') || node.getAttribute('href')).join('|');
@@ -109,17 +113,34 @@
     render(next, url, event.state.zjScroll || [0, 0]);
   });
 
-  window.addEventListener('pagehide', () => {
+  function releaseUnloadGuard() {
+    // Only guard while work is queued/in flight; don't retain an unload listener on an idle page.
+    if (warmTask === null && pending.size === 0) window.removeEventListener('beforeunload', stopPreloads);
+  }
+
+  function stopPreloads() {
+    leaving = true;
+    if ('cancelIdleCallback' in window) cancelIdleCallback(warmTask);
+    else clearTimeout(warmTask);
+    warmTask = null;
     pending.forEach(controller => controller.abort());
     pending.clear();
+    releaseUnloadGuard();
+  }
+  window.addEventListener('pagehide', stopPreloads);
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) { leaving = false; schedule(); }
   });
 
   for (const type of ['pointerover', 'focusin', 'touchstart']) {
     document.addEventListener(type, event => prefetch(localPage(event.target.closest('a[href]'))), { passive: true });
   }
   const schedule = () => {
-    if ('requestIdleCallback' in window) requestIdleCallback(warmNavigation, { timeout: 1000 });
-    else setTimeout(warmNavigation, 150);
+    if (leaving || warmTask !== null) return;
+    window.addEventListener('beforeunload', stopPreloads);
+    const warm = () => { warmTask = null; warmNavigation(); releaseUnloadGuard(); };
+    if ('requestIdleCallback' in window) warmTask = requestIdleCallback(warm, { timeout: 1000 });
+    else warmTask = setTimeout(warm, 150);
   };
   if (document.readyState === 'complete') schedule();
   else window.addEventListener('load', schedule, { once: true });

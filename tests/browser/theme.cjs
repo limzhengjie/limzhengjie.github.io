@@ -7,9 +7,9 @@ const playwright = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(__dirname, '../..');
 const routes = ['/', '/writing/', '/designs/', '/projects/',
   '/designs/ai-adoption/', '/designs/cxmt-price-discovery/',
-  '/designs/agentic-payments/', '/designs/revenue-per-employee/'];
+  '/designs/agentic-payments/', '/designs/revenue-per-employee/', '/missing-page/'];
 const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript',
-  '.png': 'image/png', '.webp': 'image/webp', '.ico': 'image/x-icon' };
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon' };
 const opposite = theme => theme === 'dark' ? 'light' : 'dark';
 
 async function expectTheme(page, theme) {
@@ -40,7 +40,10 @@ async function run() {
       if (!file.startsWith(root + path.sep)) throw new Error('Invalid path');
       res.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
       res.end(await fs.readFile(file));
-    } catch (_) { res.writeHead(404); res.end('Not found'); }
+    } catch (_) {
+      res.writeHead(404, { 'Content-Type': 'text/html' });
+      res.end(await fs.readFile(path.join(root, '404.html')));
+    }
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const base = process.env.SITE_URL || `http://127.0.0.1:${server.address().port}`;
@@ -129,7 +132,8 @@ async function run() {
           for (const width of [390, 1440]) {
             await page.setViewportSize({ width, height: 900 });
             for (const route of routes) {
-              await page.goto(base + route, { waitUntil: 'load' });
+              const response = await page.goto(base + route, { waitUntil: 'load' });
+              assert.equal(response.status(), route === '/missing-page/' ? 404 : 200, route);
               if (await page.locator('.site-boot').count()) await page.getByRole('button', { name: 'Skip introduction' }).click();
               await expectTheme(page, initial);
               await page.locator('.theme-lamp').tap();

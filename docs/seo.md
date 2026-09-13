@@ -4,13 +4,29 @@ The site should help people find Zheng Jie Lim and his research on crypto, finte
 
 ## September 13, 2026 audit
 
-Public checks confirmed that Home, Writing and Designs return HTTP 200, HTTP and www redirect to the HTTPS apex domain, the github.io hostname redirects to the custom domain, and an unknown route returns a real 404. Canonical URLs, navigation and the sitemap were already in place. The writing publishing workflow was healthy.
+Technical eligibility is verified; Google's actual indexing and ranking are not yet verified. Public HTTP requests returned the following results:
 
-A mobile-sized Chromium run with normal motion settings measured the biography becoming visible about 10.6 seconds after navigation because of the terminal intro. This is a one-run browser observation, not a field Core Web Vitals result. The blocking intro and external Typed.js dependency have been removed so the same HTML can render immediately.
+| Page | HTTP | Canonical and indexing policy |
+| --- | --- | --- |
+| `/` | 200 | HTTPS self canonical, indexable |
+| `/writing/` | 200 | HTTPS self canonical, indexable |
+| `/designs/` | 200 | HTTPS self canonical, indexable |
+| `/designs/ai-adoption/` | 200 | HTTPS self canonical, indexable |
+| `/designs/cxmt-price-discovery/` | 200 | HTTPS self canonical, indexable |
+| `/designs/agentic-payments/` | 200 | HTTPS self canonical, indexable |
+| `/designs/revenue-per-employee/` | 200 | HTTPS self canonical, indexable |
+| `/projects/` | 200 | `noindex, follow`, excluded from sitemap |
+| Unknown path | 404 | Real error response, not a homepage redirect |
 
-At the owner’s request, a later update adds a full-screen first-visit introduction lasting about six seconds, with immediate X/Escape dismissal and reduced-motion bypass. It intentionally covers the homepage until completion or dismissal. The biography, navigation and portrait remain in the initial HTML; without JavaScript the homepage is shown directly. The supplied portrait is also in Person metadata.
+All seven indexable pages have unique titles and descriptions, one H1 and no HTTP `X-Robots-Tag` block. The audit fetched 27 page assets successfully and checked 37 outbound links: 36 returned 200; LinkedIn returned its automated-access response (999), which is not evidence of a broken profile. HTTP, www and github.io requests redirect permanently to the HTTPS apex while preserving the tested paths. `/writing` redirects to `/writing/`. Explicit `index.html` variants return 200 on GitHub Pages but declare the clean directory URL as canonical; internal links and the sitemap consistently use that URL.
 
-The next layer of work adds a page per research infographic, with a topic-specific title and description, visible context, original source credits, dates, image and breadcrumb metadata, image sitemap entries, and links from the gallery captions. Clicking the images still opens the full-image viewer. Homepage metadata and biography now focus on the requested subjects, with consistent WebSite / ProfilePage / Person identity. Obsolete meta keywords have been removed.
+The cleanup replaces the old cartoon/github.io social preview with the approved portrait, current name and domain. Home, Writing and Projects now declare image dimensions and descriptive social alt text. Legacy favicon URLs use the current ZJ mark, and an unused cartoon favicon is removed. The portrait joins the four original graphics in the image sitemap. A custom 404 page keeps the site navigation and theme, with `noindex` and no misleading homepage canonical.
+
+The expanded checks run before publishing. They catch missing sitemap entries, accidental indexing of placeholders, blocked crawling, future sitemap dates, missing responsive images, social-image metadata errors and stale shared-asset versions. They validate markup and files; they do not claim that Google has indexed a page.
+
+Browser QA also reproduced a WebKit navigation race: the 150ms preload timer could fire after native navigation started but before `pagehide`. The navigation helper now cancels queued and in-flight work at departure, releases its temporary unload guard when idle, and resumes warming after a back/forward-cache restore. A regression observes late fetches during a delayed document response. The previously unversioned navigation script now has a content hash across every page, so existing visitors fetch the fix.
+
+The approved full-screen introduction lasts about six seconds on a first visit, with immediate X/Escape dismissal and reduced-motion bypass. It intentionally delays seeing the homepage. Biography, navigation and portrait remain in the initial HTML and work without JavaScript. This is an intentional experience tradeoff, not a performance optimization or proof of good field Core Web Vitals. No verified Search Console/Chrome User Experience Report performance data is available in this audit.
 
 ## Publishing rules
 
@@ -20,20 +36,21 @@ The next layer of work adds a page per research infographic, with a topic-specif
 - Include original image links, descriptive alt text and compressed responsive previews. Add the page and image to the sitemap.
 - Update lastmod when content changes, not on every scheduled run. The writing sync preserves unrelated sitemap entries.
 - Projects is a "Coming soon" placeholder, with `noindex, follow` and no sitemap entry. Add useful project content before removing `noindex` and adding its canonical URL to the sitemap.
-- Run the test suite and browser checks before publishing. The SEO tests cover every page listed in the sitemap.
+- Run the test suite and browser checks before publishing. The SEO tests cover sitemap pages, Projects and the 404 page; the browser suite includes both themes and 200% text.
 - Prefer specific, natural topic language to keyword repetition. Extra schema fields and word count alone do not establish expertise or guarantee search features.
 
 ## Search Console: account step still required
 
-Automated access to the signed-in browser failed in this session, so no Search Console property, sitemap submission or indexing request has been verified or completed.
+Automated access to the signed-in browser failed again during this audit because the browser tool's sandbox could not initialize. No Search Console connector is available. No property verification, sitemap submission or indexing request has been verified or completed. A public search-tool check did not surface results for the exact domain, but that tool is not Search Console and an empty `site:` query cannot establish that a page is absent from Google's index.
 
-1. Open the verified property for limzhengjie.com in Google Search Console. If none exists, verify a domain property using the DNS TXT record Google supplies, or verify the HTTPS URL-prefix property using Google's supplied HTML file or meta tag. Never invent a verification token.
+1. Open the verified property for limzhengjie.com in [Google Search Console](https://search.google.com/search-console). If none exists, verify a domain property using the DNS TXT record Google supplies, or verify the HTTPS URL-prefix property using Google's supplied HTML file or meta tag. Never invent a verification token.
 2. Submit `https://limzhengjie.com/sitemap.xml` in Sitemaps.
 3. Use URL Inspection on Home, Writing, Designs and the four new infographic pages. Check Google's selected canonical, crawl access and indexing status. Request indexing for the new pages where appropriate.
-4. Once data accumulates, use Performance to inspect branded queries, research-topic queries, clicks and impressions. Review Page Indexing and Core Web Vitals for actual issues. Deployment and valid markup do not guarantee indexing, rankings or rich results.
+4. Record each page's indexed/not-indexed verdict, last crawl date, Google-selected canonical and any exclusion reason. The URL Inspection live test establishes current accessibility; it does not replace the indexed-version verdict.
+5. Once data accumulates, use Performance to inspect branded queries, research-topic queries, clicks and impressions. Review Page Indexing and Core Web Vitals for actual issues. Deployment and valid markup do not guarantee indexing, rankings or rich results. Requests can take days or weeks; repeating them does not accelerate crawling.
 
 ## Growth after the technical work
 
 Publish original research notes when there is a worthwhile new finding, and link related writing and infographics together. Link to relevant pages from genuine public profiles and bylines when appropriate. Keep experience and affiliations accurate; distinguish personal research from the wider Learn To Invest feed.
 
-Sources: [Google SEO Starter Guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide), [Google image SEO](https://developers.google.com/search/docs/appearance/google-images), [site-name markup](https://developers.google.com/search/docs/appearance/site-names), [profile-page markup](https://developers.google.com/search/docs/appearance/structured-data/profile-page).
+Sources: [Google SEO Starter Guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide), [Google image SEO](https://developers.google.com/search/docs/appearance/google-images), [site-name markup](https://developers.google.com/search/docs/appearance/site-names), [profile-page markup](https://developers.google.com/search/docs/appearance/structured-data/profile-page), [requesting a recrawl](https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl), [limits of the site: operator](https://developers.google.com/search/docs/monitor-debug/search-operators/all-search-site).
