@@ -4,9 +4,9 @@ Static personal website at [limzhengjie.com](https://limzhengjie.com/), publishe
 
 - `/`: biography, Home / Writing / Designs navigation and profile links.
 - `/writing/`: Artemis bylines first, then the latest 25 Learn To Invest articles.
-- `/designs/`: four dated infographics with responsive previews, descriptions and full-size originals. The portfolio is indexable and included in the sitemap.
+- `/designs/`: four dated infographics in a minimal image grid. Click a preview for a full-image viewer with zoom and an original-image link. The portfolio is indexable and included in the sitemap.
 
-The existing terminal intro remains on the homepage. Reduced-motion preferences skip it; Writing and Designs render without JavaScript.
+The existing terminal intro remains on the homepage. Reduced-motion preferences skip it; Writing and Designs render without JavaScript. Designs progressively enhances its image links with a viewer when JavaScript is available.
 
 ## Automatic writing updates
 
@@ -44,6 +44,6 @@ The sitemap and robots file advertise `https://limzhengjie.com/writing/`. Articl
 
 ## Infographic portfolio
 
-Designs contains static snapshots supplied by Zheng Jie, newest first. Visible dates describe each graphic's data period, not a live refresh or publication date. The original PNGs in `assets/designs/` are unchanged; 800px and 1600px WebP copies provide smaller responsive previews. Only the first preview loads eagerly. Each piece includes its original branding and source notes, a text description, alt text and a direct full-size link. CollectionPage / ItemList / ImageObject schema describes the displayed work.
+Designs contains static snapshots supplied by Zheng Jie, newest first. Visible dates describe each graphic's data period, not a live refresh or publication date. The original PNGs in `assets/designs/` are unchanged; 800px and 1600px WebP copies provide smaller responsive previews. Only the first preview loads eagerly. Each image is a direct link to its original PNG, enhanced by `assets/js/designs.js` with an accessible native dialog, fit/zoom controls, Escape-to-close and focus restoration. Without JavaScript, or when opening a link in another tab, visitors go directly to the original. Original branding and source notes remain in the artwork; CollectionPage / ItemList / ImageObject schema describes the displayed work.
 
 Infographic statistics do not auto-update. To add a piece, copy its original and preview assets, add the article and matching schema entry in `designs/index.html`, and update the Designs sitemap modification date. Keep historical reporting periods and estimates explicit.
