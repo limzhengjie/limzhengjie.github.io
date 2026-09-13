@@ -79,6 +79,8 @@
     if (!savedTheme) applyTheme();
   });
 
+  document.addEventListener('site:load', applyTheme);
+
   window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
       readStoredTheme();

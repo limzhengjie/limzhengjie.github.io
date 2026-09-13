@@ -75,6 +75,11 @@ main {
   text-align: center;
 }
 
+/* Focus lands on new content after a cached page change. */
+main[tabindex="-1"]:focus {
+  outline: none;
+}
+
 header {
   margin: 0;
 }
