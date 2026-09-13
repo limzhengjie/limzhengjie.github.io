@@ -48,8 +48,9 @@
     <script src="/assets/js/theme.js?v=c30bef6b3b82"></script>
     <script src="/assets/js/home.js?v=1f3f4262c732" defer></script>
     <script src="/assets/js/designs.js?v=5dc2671f8cc6" defer></script>
+    <script src="/assets/js/spark.js?v=621d6b9ad8b4" defer></script>
     <script src="/assets/js/navigation.js?v=24d5522898b8" defer></script>
-    <link rel="stylesheet" href="/assets/css/site.css?v=a8849cf011ee" />
+    <link rel="stylesheet" href="/assets/css/site.css?v=7c67561c05af" />
 
     <script type="application/ld+json">
       {
@@ -220,6 +221,16 @@
           </li>
         </ul>
       </nav>
+      <footer class="site-play" data-spark hidden>
+        <div class="spark-control">
+          <button class="spark-button" type="button" aria-label="Add a spark" aria-describedby="spark-description" disabled>
+            <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path d="M16 2c1.8 9 5 12.2 14 14-9 1.8-12.2 5-14 14C14.2 21 11 17.8 2 16 11 14.2 14.2 11 16 2Z" fill="currentColor" /></svg>
+          </button>
+        </div>
+        <p class="spark-total"><output data-spark-count aria-live="polite">—</output> sparks</p>
+        <p class="spark-description" id="spark-description">A spark for every visit. Add yours.</p>
+        <p class="spark-status"><span data-spark-status role="status"></span> <button class="spark-retry" type="button" hidden>Retry</button></p>
+      </footer>
     </main>
   </body>
 </html>

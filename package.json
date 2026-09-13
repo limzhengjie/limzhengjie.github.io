@@ -2,7 +2,8 @@
   "name": "zheng-jie-personal-site",
   "private": true,
   "scripts": {
-    "test:browser": "node tests/browser/theme.cjs && node tests/browser/navigation.cjs"
+    "test:browser": "node tests/browser/theme.cjs && node tests/browser/navigation.cjs && node tests/browser/spark.cjs",
+    "test:counter": "node --test tests/counter-api.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

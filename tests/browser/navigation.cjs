@@ -116,7 +116,7 @@ async function run() {
           window.addEventListener('beforeunload', () => { leaving = true; });
           const fetch = window.fetch;
           window.fetch = (...args) => {
-            if (leaving) console.log('late-preload');
+            if (leaving && !String(args[0]).endsWith('/api/spark')) console.log('late-preload');
             return fetch(...args);
           };
         });
@@ -151,7 +151,7 @@ async function run() {
           const context = await browser.newContext({ javaScriptEnabled: mode !== 'no-js', reducedMotion: 'reduce' });
           const page = await context.newPage();
           const fetches = [];
-          page.on('request', req => { if (req.resourceType() === 'fetch') fetches.push(req.url()); });
+          page.on('request', req => { if (req.resourceType() === 'fetch' && !req.url().endsWith('/api/spark')) fetches.push(req.url()); });
           if (mode === 'blocked-script') await page.route('**/assets/js/navigation.js*', route => route.abort());
           if (mode === 'save-data') await page.addInitScript(() => Object.defineProperty(navigator, 'connection', { value: { saveData: true } }));
           let release;
