@@ -83,6 +83,7 @@ test('rate limit is atomic, expires, and does not reject an already saved retry'
   assert.equal(responses.filter(r => r.statusCode === 200).length, 12);
   assert.equal(responses.filter(r => r.statusCode === 429).length, 3);
   assert.ok(responses.filter(r => r.statusCode === 429).every(r => Number(r.headers['retry-after']) > 0));
+  assert.ok(responses.filter(r => r.statusCode === 429).every(r => r.headers['access-control-expose-headers'] === 'Retry-After'));
   const accepted = bodies[responses.findIndex(r => r.statusCode === 200)];
   assert.equal((await call({ body: accepted, headers })).statusCode, 200);
   const keys = await command(['KEYS', 'spark:production:rate:*']);

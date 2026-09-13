@@ -36,7 +36,10 @@ function createHandler({ env = process.env, fetcher = fetch } = {}) {
     if (env.VERCEL_ENV !== 'production') allowed.delete('https://limzhengjie.com');
     const origin = req.headers.origin;
     if (origin && !allowed.has(origin)) return send(403, { error: 'Origin not allowed' });
-    if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Expose-Headers', 'Retry-After');
+    }
     if (req.method === 'OPTIONS') {
       if (!origin) return send(403, { error: 'Origin required' });
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
