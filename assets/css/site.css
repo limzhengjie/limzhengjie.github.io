@@ -98,6 +98,46 @@ h1 {
   font-size: 0.88rem;
 }
 
+.about {
+  margin: 0.85rem 0 0;
+}
+
+.about p {
+  margin: 0;
+  font-family:
+    "Avenir Next",
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.about p + p {
+  margin-top: 0.45rem;
+}
+
+.about a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--fg) 30%, transparent);
+  text-underline-offset: 0.18em;
+}
+
+.about a:hover {
+  text-decoration-color: var(--fg);
+}
+
+.about a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 nav {
   margin-top: 2rem;
   padding-top: 1.35rem;
@@ -183,6 +223,7 @@ nav a:focus-visible {
 html.boot .name,
 html.boot h1,
 html.boot .lede,
+html.boot .about,
 html.boot nav li {
   opacity: 0;
 }
@@ -255,8 +296,13 @@ html.boot:not(.intro-done) nav {
   transform: translateX(100%);
 }
 
-html.intro-done .lede {
+html.intro-done .lede,
+html.intro-done .about {
   animation: fadeIn 0.45s ease forwards;
+}
+
+html.intro-done .about {
+  animation-delay: 0.12s;
 }
 
 html.intro-done nav li {
@@ -291,8 +337,10 @@ html.intro-done nav li:nth-child(6) {
   html.boot .name,
   html.boot h1,
   html.boot .lede,
+  html.boot .about,
   html.boot nav,
   html.intro-done .lede,
+  html.intro-done .about,
   html.intro-done nav li {
     opacity: 1;
     animation: none;
