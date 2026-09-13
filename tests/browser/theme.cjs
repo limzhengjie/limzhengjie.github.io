@@ -20,6 +20,13 @@ async function expectTheme(page, theme) {
     `Switch to ${opposite(theme)} mode`);
 }
 
+async function expectCenteredIntro(page) {
+  const box = await page.locator('.site-boot').boundingBox();
+  const viewport = page.viewportSize();
+  assert.ok(Math.abs(box.x + box.width / 2 - viewport.width / 2) < 2, 'startup is not horizontally centered');
+  assert.ok(Math.abs(box.y + box.height / 2 - viewport.height / 2) < 2, 'startup is not vertically centered');
+}
+
 async function run() {
   const server = http.createServer(async (req, res) => {
     try {
@@ -45,6 +52,7 @@ async function run() {
         const home = await welcome.newPage();
         await home.goto(base + '/', { waitUntil: 'domcontentloaded' });
         await home.locator('.site-boot').waitFor();
+        await expectCenteredIntro(home);
         assert.equal(await home.locator('.about').evaluate(e => getComputedStyle(e).opacity), '1');
         assert.ok(await home.locator('.site-nav').isVisible());
         await home.locator('.profile-portrait img').evaluate(e => e.decode());
@@ -72,6 +80,7 @@ async function run() {
             assert.equal(await page.locator('.lamp-fixture').evaluate(e => getComputedStyle(e).animationName), 'none');
           }
           else {
+            await expectCenteredIntro(page);
             await page.getByRole('button', { name: 'Skip introduction' }).click();
             assert.equal(await page.locator('.site-boot').count(), 0);
           }

@@ -125,8 +125,9 @@ header {
 .site-boot {
   position: fixed;
   z-index: 20;
-  bottom: max(1rem, env(safe-area-inset-bottom));
-  left: max(1rem, env(safe-area-inset-left));
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: min(280px, calc(100% - 2rem));
   padding: 0.5rem 1rem 1rem;
   border: 1px solid var(--rule);
