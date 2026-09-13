@@ -115,6 +115,7 @@ async function run() {
         await page.getByRole('button', { name: 'Add a spark', exact: true }).click();
         for (let i = 0; i < 50 && !release; i++) await sleep(20);
         assert.ok(release);
+        assert.equal(await page.locator('[data-spark-status]').textContent(), '', 'saving should stay visually quiet');
         await page.locator('.site-nav a[href="/writing/"]').click(); await page.waitForURL(base + '/writing/');
         release(); release = undefined;
         await page.locator('.site-nav a[href="/"]').click(); await page.waitForURL(base + '/');

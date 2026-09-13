@@ -8,6 +8,8 @@ because taps and visits are combined. The icon briefly turns and a small `+1`
 floats up; reduced-motion visitors get the same functionality without animation.
 The saved total is the only number shown. Loading or failure must never look like
 a saved zero or a successful tap.
+Successful taps use only the spark animation and updated count; no “Saving” label
+appears while a request is in flight.
 
 ## Implementation
 

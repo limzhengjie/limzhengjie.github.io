@@ -27,7 +27,7 @@
     view.button.disabled = total === null || Boolean(failure) || session.queue.reduce((sum, x) => sum + x.amount, 0) >= 30;
     view.retry.hidden = !failure;
     view.retry.disabled = Boolean(failure && Date.now() < failure.retryAt);
-    view.status.textContent = failure ? failure.message : busy ? 'Saving…' : total === null ? 'Connecting…' : '';
+    view.status.textContent = failure ? failure.message : total === null ? 'Connecting…' : '';
   }
   function accept(value) {
     if (!Number.isSafeInteger(value) || value < 0) throw new Error('Invalid total');
