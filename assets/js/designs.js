@@ -38,7 +38,7 @@
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
       opener = link;
-      title.textContent = link.closest('.design-piece').querySelector('h3').textContent;
+      title.textContent = link.closest('.design-piece').querySelector('h1, h3').textContent;
       original.href = link.href;
       image.alt = link.querySelector('img').alt;
       status.textContent = 'Loading image…';
