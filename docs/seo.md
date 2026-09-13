@@ -47,7 +47,9 @@ The sitemap was resubmitted successfully. Its discovered-page count increased fr
 
 URL Inspection confirms the homepage is on Google, with a successful smartphone crawl on September 13, 2026 at 01:16:07 (as displayed by Search Console). Crawling and indexing are allowed, and Google selected the inspected HTTPS homepage as canonical. A fresh indexing request was accepted for the homepage. Writing is discovered but not yet indexed, with no recorded crawl or Google-selected canonical.
 
-Use URL Inspection to check the other pages' actual indexing verdicts. Keep Projects excluded while it is a placeholder. Requests can take days or weeks; repeating them does not accelerate crawling. Record new results when Google updates its reports rather than treating successful deployment or sitemap discovery as proof of indexing.
+Writing's indexing request was also accepted. The public GitHub profile now links to `https://limzhengjie.com/`; LinkedIn's personal website was updated from the old GitHub Pages URL and its Learn To Invest blog link was preserved. Both profile changes were verified after saving.
+
+Use URL Inspection to check the other five pages' actual indexing verdicts; their individual requests are not yet confirmed. Keep Projects excluded while it is a placeholder. Requests can take days or weeks; repeating them does not accelerate crawling. Record new results when Google updates its reports rather than treating successful deployment or sitemap discovery as proof of indexing.
 
 ## Research notes and measurement
 

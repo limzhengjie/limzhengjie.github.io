@@ -75,6 +75,42 @@ main {
   text-align: center;
 }
 
+/* A quiet, shared plaything beneath the homepage links. */
+.site-play {
+  margin-top: 2.25rem;
+  color: var(--muted);
+}
+
+.site-play[hidden], .spark-retry[hidden] { display: none; }
+.spark-control { position: relative; width: 52px; margin: 0 auto .65rem; }
+.spark-button {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.spark-button:disabled { cursor: default; opacity: .5; }
+.spark-button:hover:not(:disabled) { border-color: var(--muted); }
+.spark-button:focus-visible, .spark-retry:focus-visible { outline: 2px solid var(--focus); outline-offset: 5px; }
+.spark-total { margin: 0; font: 12px/1.6 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.spark-total output { color: var(--fg); font-variant-numeric: tabular-nums; }
+.spark-description { margin: .25rem 0 0; font-size: 13px; }
+.spark-status { min-height: 24px; margin: .25rem 0 0; font-size: 12px; }
+.spark-retry { min-height: 44px; padding: 0 .5rem; border: 0; background: transparent; color: var(--fg); font: inherit; text-decoration: underline; cursor: pointer; }
+.spark-particle { position: absolute; pointer-events: none; top: -8px; right: -10px; font: 12px ui-monospace, monospace; color: var(--fg); }
+@media (prefers-reduced-motion: no-preference) {
+  .spark-particle { animation: spark-rise .6s ease-out both; }
+  @keyframes spark-rise { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-24px); } }
+}
+
 /* Focus lands on new content after a cached page change. */
 main[tabindex="-1"]:focus {
   outline: none;

@@ -34,6 +34,10 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Install Redis for counter persistence tests
+        run: sudo apt-get update && sudo apt-get install -y redis-server
+      - name: Check concurrent counter writes and persistence
+        run: npm run test:counter
       - run: npx playwright install --with-deps chromium webkit
       - name: Check themes, navigation, enlarged text, and image viewing
         run: npm run test:browser
