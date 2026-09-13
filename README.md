@@ -2,12 +2,14 @@
 
 Static personal website at [limzhengjie.com](https://limzhengjie.com/), published with GitHub Pages.
 
-- `/`: biography, Home / Writing / Designs navigation and profile links.
+- `/`: biography, portrait, Home / Writing / Designs / Projects navigation and profile links.
 - `/writing/`: Artemis bylines first, then the latest 25 Learn To Invest articles.
 - `/designs/`: four dated infographics in a minimal image grid. Click a preview for a full-image viewer with zoom and an original-image link. The portfolio is indexable and included in the sitemap.
 - `/designs/<subject>/`: individual research graphics with a summary, data date, source credits and reporting context. Gallery titles link to these pages while image clicks keep opening the viewer.
+- `/projects/`: a coming-soon page, deliberately excluded from indexing until it contains work.
+- `404.html`: a themed error page with navigation back into the site; GitHub Pages serves it with HTTP 404 for unknown URLs.
 
-The homepage biography and navigation render immediately, with no blocking intro or external JavaScript. All pages render without JavaScript. Designs progressively enhances its image links with a viewer when JavaScript is available.
+All pages include their content and navigation in the initial HTML and work without JavaScript. With JavaScript, the homepage shows the approved six-second full-screen introduction once per browser. X or Escape dismisses it immediately; reduced-motion preferences skip it. The hanging lamp switches between saved light and dark themes. Cached navigation makes warmed page links immediate, with ordinary navigation as the fallback. Designs enhances its image links with a full-image viewer.
 
 ## Automatic writing updates
 
@@ -41,7 +43,11 @@ For a local preview, run `python3 -m http.server 8000` and visit `http://localho
 
 GitHub Pages must use **GitHub Actions** as its build source, with `limzhengjie.com` as the custom domain and HTTPS enforced. The build has read-only repository permissions; the separate deployment job has only `pages: write` and `id-token: write`. Only the public pages, assets and SEO files enter the deployment artifact.
 
-The sitemap and robots file advertise `https://limzhengjie.com/writing/`. Article schema points to the original publishers. The index has a self canonical, topic-specific title and description, social metadata, and breadcrumb schema. Submit the sitemap and request `/writing/` in Google Search Console using a verified owner or full-user account. Deployment does not guarantee Google indexing.
+The sitemap advertises seven canonical pages, the portrait and four original infographics. Robots allows crawling; Projects and the 404 page carry `noindex`. Article schema points to the original publishers. Indexable pages have self canonicals, unique titles and descriptions, social metadata and appropriate structured data. See [the SEO audit and Search Console checklist](docs/seo.md) for verification status. Deployment does not establish Google indexing.
+
+The SEO suite checks sitemap coverage, crawl directives, metadata, social-image dimensions and alt descriptions, responsive image paths, structured data, and content hashes for versioned shared assets. The browser suite also checks the 404 layout in both themes and at enlarged text sizes.
+
+To refresh the homepage/Writing social preview after changing the profile, run `node scripts/social-image.cjs` with Playwright Chromium installed. It renders the approved portrait and site typography to `assets/brand/zheng-jie-lim-social.png`, with `og-image.png` retained as a legacy copy. Set `CHROMIUM_EXECUTABLE_PATH` and `PLAYWRIGHT_MODULE` when using a bundled runtime. New artwork should use a new metadata URL when an already-shared preview must be refreshed; social platforms control their own caches.
 
 ## Infographic portfolio
 

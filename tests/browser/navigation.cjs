@@ -19,7 +19,10 @@ async function run() {
       if (file.endsWith('.html')) await sleep(180); // Reproduce the wait on a modest connection.
       res.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
       res.end(await fs.readFile(file));
-    } catch (_) { res.writeHead(404); res.end('Not found'); }
+    } catch (_) {
+      res.writeHead(404, { 'Content-Type': 'text/html' });
+      res.end(await fs.readFile(path.join(root, '404.html')));
+    }
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const base = process.env.SITE_URL || `http://127.0.0.1:${server.address().port}`;
@@ -101,13 +104,55 @@ async function run() {
             await context.close();
           }
         }
+        // A queued preload must not start during the next document's response wait.
+        const departing = await browser.newContext({ reducedMotion: 'reduce' });
+        const departingPage = await departing.newPage();
+        const latePreloads = [];
+        departingPage.on('console', message => {
+          if (message.text() === 'late-preload') latePreloads.push(message.text());
+        });
+        await departingPage.addInitScript(() => {
+          let leaving = false;
+          window.addEventListener('beforeunload', () => { leaving = true; });
+          const fetch = window.fetch;
+          window.fetch = (...args) => {
+            if (leaving) console.log('late-preload');
+            return fetch(...args);
+          };
+        });
+        await departingPage.goto(base + '/writing/', { waitUntil: 'load' });
+        await departingPage.goto(base + '/projects/', { waitUntil: 'load' });
+        assert.deepEqual(latePreloads, [], 'queued preloads started after native navigation began');
+        await departing.close();
+        console.log(`${engine}: departing documents do not start new preloads`);
+
+        // Recovery from a real 404 must also replace noindex metadata on the destination.
+        for (const javaScriptEnabled of [true, false]) {
+          const context = await browser.newContext({ javaScriptEnabled, reducedMotion: 'reduce' });
+          const page = await context.newPage();
+          assert.equal((await page.goto(base + '/missing-page/', { waitUntil: 'load' })).status(), 404);
+          await page.getByRole('heading', { name: 'Page not found', exact: true }).waitFor();
+          assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex, follow');
+          assert.equal(await page.locator('link[rel="canonical"]').count(), 0);
+          if (javaScriptEnabled) await page.waitForTimeout(1200);
+          await page.locator('.site-nav a[href="/writing/"]').click();
+          await page.waitForURL(base + '/writing/');
+          assert.ok(!(await page.locator('meta[name="robots"]').getAttribute('content')).includes('noindex'));
+          assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), 'https://limzhengjie.com/writing/');
+          await page.goBack();
+          await page.getByRole('heading', { name: 'Page not found', exact: true }).waitFor();
+          assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex, follow');
+          assert.equal(await page.locator('link[rel="canonical"]').count(), 0);
+          await context.close();
+          console.log(`${engine}: 404 recovery, history and indexing directives passed (JavaScript ${javaScriptEnabled})`);
+        }
         // Direct entry, cold/error fallback, native link behavior, and saved-data preferences.
         for (const mode of ['no-js', 'blocked-script', 'failed-prefetch', 'pending-prefetch', 'save-data', 'expired-cache']) {
           const context = await browser.newContext({ javaScriptEnabled: mode !== 'no-js', reducedMotion: 'reduce' });
           const page = await context.newPage();
           const fetches = [];
           page.on('request', req => { if (req.resourceType() === 'fetch') fetches.push(req.url()); });
-          if (mode === 'blocked-script') await page.route('**/assets/js/navigation.js', route => route.abort());
+          if (mode === 'blocked-script') await page.route('**/assets/js/navigation.js*', route => route.abort());
           if (mode === 'save-data') await page.addInitScript(() => Object.defineProperty(navigator, 'connection', { value: { saveData: true } }));
           let release;
           if (mode === 'failed-prefetch' || mode === 'pending-prefetch') {

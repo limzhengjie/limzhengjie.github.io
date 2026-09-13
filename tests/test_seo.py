@@ -1,10 +1,14 @@
 """Check crawlable page and asset contracts across the published site."""
 from html.parser import HTMLParser
+from datetime import date, datetime, timezone
+import hashlib
 import json
 from pathlib import Path
 import re
 import unittest
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import parse_qs, urljoin, urlsplit
+from urllib.robotparser import RobotFileParser
+import struct
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,6 +42,9 @@ class SEOTests(unittest.TestCase):
         cls.urls = [url.findtext('s:loc', namespaces=NS) for url in cls.sitemap.findall('s:url', NS)]
         cls.html = {url: local_path(url).read_text() for url in cls.urls}
         cls.pages = {url: Page(html) for url, html in cls.html.items()}
+        cls.public_pages = dict(cls.pages)
+        for path in ['projects/index.html', '404.html']:
+            cls.public_pages[SITE + '/' + path.replace('index.html', '')] = Page((ROOT / path).read_text())
 
     def test_sitemap_pages_have_unique_metadata_and_self_canonicals(self):
         self.assertEqual(len(self.urls), len(set(self.urls)))
@@ -60,7 +67,7 @@ class SEOTests(unittest.TestCase):
         self.assertEqual(len(titles), len(set(titles)))
         self.assertEqual(len(descriptions), len(set(descriptions)))
 
-    def test_all_indexed_pages_are_reachable_from_home(self):
+    def test_all_sitemap_pages_are_reachable_from_home(self):
         reached, pending = set(), [SITE + '/']
         while pending:
             url = pending.pop()
@@ -74,7 +81,7 @@ class SEOTests(unittest.TestCase):
         self.assertEqual(reached, set(self.urls))
 
     def test_internal_links_images_and_scripts_exist(self):
-        for url, page in self.pages.items():
+        for url, page in self.public_pages.items():
             for tag, attrs in page.elements:
                 ref = attrs.get('href') if tag in ('a', 'link') else attrs.get('src') if tag in ('img', 'script') else None
                 if not ref:
@@ -86,6 +93,78 @@ class SEOTests(unittest.TestCase):
                     self.assertTrue(local_path(target).is_file(), target)
             for img in page.attrs('img'):
                 self.assertIn('alt', img)
+                if img.get('src'):
+                    self.assertGreater(int(img['width']), 0)
+                    self.assertGreater(int(img['height']), 0)
+                for candidate in img.get('srcset', '').split(','):
+                    if candidate.strip():
+                        self.assertTrue(local_path(urljoin(url, candidate.strip().split()[0])).is_file())
+
+    def test_public_page_inventory_has_an_explicit_indexing_policy(self):
+        files = set(ROOT.glob('*.html'))
+        for folder in ['writing', 'designs', 'projects']:
+            files.update((ROOT / folder).rglob('*.html'))
+        eligible = set()
+        for file in files:
+            page = Page(file.read_text())
+            robots = [a['content'] for a in page.attrs('meta') if a.get('name') == 'robots']
+            self.assertEqual(len(robots), 1, file)
+            canonical = [a['href'] for a in page.attrs('link') if a.get('rel') == 'canonical']
+            if 'noindex' in robots[0]:
+                self.assertTrue(set(canonical).isdisjoint(self.urls), file)
+            else:
+                self.assertEqual(len(canonical), 1, file)
+                eligible.add(canonical[0])
+        self.assertEqual(eligible, set(self.urls), 'An indexable page is missing from the sitemap')
+        for path in ['/projects/', '/404.html']:
+            page = self.public_pages[SITE + path]
+            self.assertIn('noindex', next(a['content'] for a in page.attrs('meta') if a.get('name') == 'robots'))
+        self.assertFalse([a for a in self.public_pages[SITE + '/404.html'].attrs('link') if a.get('rel') == 'canonical'])
+
+    def test_search_preview_images_have_real_dimensions_and_descriptions(self):
+        for url, page in self.public_pages.items():
+            if url.endswith('/404.html'):
+                continue
+            meta = {a.get('name', a.get('property')): a.get('content', '') for a in page.attrs('meta')}
+            with self.subTest(url=url):
+                self.assertEqual(meta['og:image'], meta['twitter:image'])
+                for key in ['og:image:alt', 'twitter:image:alt']:
+                    self.assertTrue(meta[key].strip())
+                image_url = meta['og:image']
+                self.assertEqual(urlsplit(image_url).scheme, 'https')
+                self.assertEqual(urlsplit(image_url).netloc, urlsplit(SITE).netloc)
+                # All current social cards are PNGs. Inspect their header without adding a dependency.
+                data = local_path(image_url).read_bytes()
+                self.assertEqual(data[:8], b'\x89PNG\r\n\x1a\n')
+                width, height = struct.unpack('>II', data[16:24])
+                self.assertEqual((int(meta['og:image:width']), int(meta['og:image:height'])), (width, height))
+
+    def test_sitemap_dates_and_robots_allow_search_discovery(self):
+        robots_text = (ROOT / 'robots.txt').read_text()
+        robots = RobotFileParser()
+        robots.parse(robots_text.splitlines())
+        self.assertIn(SITE + '/sitemap.xml', robots.site_maps())
+        for url in self.sitemap.findall('s:url', NS):
+            modified = date.fromisoformat(url.findtext('s:lastmod', namespaces=NS))
+            self.assertLessEqual(modified, datetime.now(timezone.utc).date())
+        for url, page in self.public_pages.items():
+            targets = [url] + [urljoin(url, a['src']) for a in page.attrs('script') if a.get('src')]
+            targets += [urljoin(url, a['src']) for a in page.attrs('img') if a.get('src')]
+            for target in targets:
+                self.assertTrue(robots.can_fetch('Googlebot', target), target)
+
+    def test_shared_asset_versions_match_files_on_every_page(self):
+        signatures = []
+        for url, page in self.public_pages.items():
+            refs = [a['src'] for a in page.attrs('script') if a.get('src')]
+            refs += [a['href'] for a in page.attrs('link') if a.get('rel') == 'stylesheet']
+            signatures.append(refs)
+            for ref in refs:
+                version = parse_qs(urlsplit(ref).query).get('v')
+                if version:
+                    digest = hashlib.sha256(local_path(ref).read_bytes()).hexdigest()[:12]
+                    self.assertEqual(version, [digest], f'{url}: stale asset URL {ref}')
+        self.assertTrue(all(refs == signatures[0] for refs in signatures), 'Shared asset URLs must agree for cached navigation')
 
     def test_structured_data_matches_page_identity_and_images(self):
         for url, html in self.html.items():
