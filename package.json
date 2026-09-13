@@ -1,0 +1,10 @@
+{
+  "name": "zheng-jie-personal-site",
+  "private": true,
+  "scripts": {
+    "test:browser": "node tests/browser/theme.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
