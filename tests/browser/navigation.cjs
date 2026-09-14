@@ -51,6 +51,8 @@ async function run() {
                 window.navigationPaintTimes.push(Math.round(performance.now() - start))));
             });
             const timings = [];
+            // Home goes last, and the back/forward checks after this loop assume the tab
+            // visited just before it is Projects. Insert new tabs ahead of Projects.
             for (const [name, route] of [['Writing', '/writing/'], ['Designs', '/designs/'], ['Projects', '/projects/'], ['Home', '/']]) {
               const link = page.locator('.site-nav').getByRole('link', { name, exact: true });
               const start = Date.now();
@@ -101,6 +103,25 @@ async function run() {
             await page.waitForFunction(y => Math.abs(scrollY - y) < 3, previousScroll);
             assert.deepEqual(errors, []);
             console.log(`${engine} ${theme} ${width}px: no-reload navigation, viewer, metadata, theme, history and scroll passed; click-to-frame ms:`, JSON.stringify(await page.evaluate(() => window.navigationPaintTimes.slice(0, 4))));
+            await page.locator('.site-nav a[href="/"]').click();
+            await page.waitForURL(base + '/');
+            // Personal pages belong below the About copy, outside the primary tabs.
+            assert.equal(await page.locator('.site-nav a[href="/small-wins/"]').count(), 0);
+            const wins = page.locator('.about a[href="/small-wins/"]');
+            assert.equal(await wins.evaluate(link => Boolean(
+              document.querySelector('.about a[href="/me/"]').compareDocumentPosition(link)
+                & Node.DOCUMENT_POSITION_FOLLOWING)), true);
+            await wins.click();
+            await page.waitForURL(base + '/small-wins/');
+            await page.getByRole('heading', { name: 'Small wins in life', exact: true }).waitFor();
+            assert.doesNotMatch(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
+            assert.equal(await page.locator('.wins-list > li').count(), 4);
+            assert.equal(await page.locator('.site-nav a[href="/small-wins/"]').count(), 0);
+            assert.equal(await page.locator('html').getAttribute('data-theme'), chosen);
+            await page.goBack();
+            await page.waitForURL(base + '/');
+            await page.locator('.profile-portrait').waitFor();
+            assert.deepEqual(errors, []);
             await context.close();
           }
         }

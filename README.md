@@ -7,6 +7,8 @@ Static personal website at [limzhengjie.com](https://limzhengjie.com/), publishe
 - `/designs/`: four dated infographics in a minimal image grid. Click a preview for a full-image viewer with zoom and an original-image link. The portfolio is indexable and included in the sitemap.
 - `/designs/<subject>/`: individual research graphics with a summary, data date, source credits and reporting context. Gallery titles link to these pages while image clicks keep opening the viewer.
 - `/projects/`: a coming-soon page, deliberately excluded from indexing until it contains work.
+- `/small-wins/`: small wins in life: four dated research mentions and appearances, with links to original sources. Linked below the homepage About text; indexable and included in the sitemap.
+- `/me/`: me as a person, a short list of traits. Reached from the homepage rather than the navigation, so the tab row stays short; excluded from indexing for now.
 - `404.html`: a themed error page with navigation back into the site; GitHub Pages serves it with HTTP 404 for unknown URLs.
 
 All pages include their content and navigation in the initial HTML and work without JavaScript. With JavaScript, the homepage shows the approved six-second full-screen introduction once per browser. X or Escape dismisses it immediately; reduced-motion preferences skip it. The hanging lamp switches between saved light and dark themes. Cached navigation makes warmed page links immediate, with ordinary navigation as the fallback. Designs enhances its image links with a full-image viewer.
@@ -43,7 +45,7 @@ For a local preview, run `python3 -m http.server 8000` and visit `http://localho
 
 GitHub Pages must use **GitHub Actions** as its build source, with `limzhengjie.com` as the custom domain and HTTPS enforced. The build has read-only repository permissions; the separate deployment job has only `pages: write` and `id-token: write`. Only the public pages, assets and SEO files enter the deployment artifact.
 
-The sitemap advertises seven canonical pages, the portrait and four original infographics. Robots allows crawling; Projects and the 404 page carry `noindex`. Article schema points to the original publishers. Indexable pages have self canonicals, unique titles and descriptions, social metadata and appropriate structured data. See [the SEO audit and Search Console checklist](docs/seo.md) for verification status. Deployment does not establish Google indexing.
+The sitemap advertises eight canonical pages, the portrait and four original infographics. Robots allows crawling; Projects, Me as a person and the 404 page carry `noindex`. Article schema points to the original publishers. Indexable pages have self canonicals, unique titles and descriptions, social metadata and appropriate structured data. See [the SEO audit and Search Console checklist](docs/seo.md) for verification status. Deployment does not establish Google indexing.
 
 The SEO suite checks sitemap coverage, crawl directives, metadata, social-image dimensions and alt descriptions, responsive image paths, structured data, and content hashes for versioned shared assets. The browser suite also checks the 404 layout in both themes and at enlarged text sizes.
 

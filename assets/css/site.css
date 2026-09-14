@@ -345,7 +345,30 @@ body:has(> .site-boot[open]) {
   80% { transform: rotate(4deg); }
 }
 
-.projects-placeholder {
+.trait-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wins-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wins-list li + li {
+  margin-top: 1.4rem;
+}
+
+.wins-list time {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--muted);
+  font: 0.8rem/1.5 "Avenir Next", "Segoe UI", sans-serif;
+}
+
+.page-placeholder {
   margin: 4rem 0;
   text-align: center;
   color: var(--muted);
@@ -407,7 +430,8 @@ h1 {
   margin: 1.25rem 0 0;
 }
 
-.about p {
+.about p,
+.about .trait-list li {
   margin: 0;
   font-family:
     "Avenir Next",
@@ -421,7 +445,8 @@ h1 {
   color: var(--muted);
 }
 
-.about p + p {
+.about p + p,
+.about .trait-list li + li {
   margin-top: 0.65rem;
 }
 
@@ -431,7 +456,8 @@ h1 {
     padding-right: 0.85rem;
   }
 
-  .about p {
+  .about p,
+.about .trait-list li {
     font-size: 0.9rem;
   }
 }
