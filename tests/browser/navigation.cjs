@@ -51,7 +51,9 @@ async function run() {
                 window.navigationPaintTimes.push(Math.round(performance.now() - start))));
             });
             const timings = [];
-            for (const [name, route] of [['Writing', '/writing/'], ['Designs', '/designs/'], ['Projects', '/projects/'], ['Small Wins', '/small-wins/'], ['Home', '/']]) {
+            // Home goes last, and the back/forward checks after this loop assume the tab
+            // visited just before it is Projects. Insert new tabs ahead of Projects.
+            for (const [name, route] of [['Small Wins', '/small-wins/'], ['Writing', '/writing/'], ['Designs', '/designs/'], ['Projects', '/projects/'], ['Home', '/']]) {
               const link = page.locator('.site-nav').getByRole('link', { name, exact: true });
               const start = Date.now();
               if (width === 390) await link.tap(); else { await link.focus(); await page.keyboard.press('Enter'); }
