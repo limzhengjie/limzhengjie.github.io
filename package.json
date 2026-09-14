@@ -2,7 +2,7 @@
   "name": "zheng-jie-personal-site",
   "private": true,
   "scripts": {
-    "test:browser": "node tests/browser/theme.cjs && node tests/browser/navigation.cjs && node tests/browser/transitions.cjs && node tests/browser/spark.cjs && node tests/browser/analytics.cjs",
+    "test:browser": "node tests/browser/theme.cjs && node tests/browser/navigation.cjs && node tests/browser/navigation-cache.cjs && node tests/browser/transitions.cjs && node tests/browser/spark.cjs && node tests/browser/analytics.cjs",
     "test:counter": "node --test tests/counter-api.cjs"
   },
   "devDependencies": {

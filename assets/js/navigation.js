@@ -4,7 +4,8 @@
   const pending = new Map();
   let leaving = false;
   let warmTask = null;
-  const maxAge = 60_000;
+  const freshFor = 60_000;
+  const maxAge = 30 * 60_000;
   const metadata = 'title, meta[name], meta[property], link[rel="canonical"], script[type="application/ld+json"]';
   let currentPath = location.pathname;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -13,9 +14,9 @@
   const canPrefetch = () => !navigator.connection?.saveData &&
     !['slow-2g', '2g'].includes(navigator.connection?.effectiveType);
 
-  function cached(url) {
+  function cached(url, lifetime = maxAge) {
     const page = pages.get(pageKey(url));
-    return page && Date.now() - page.saved < maxAge ? page.html : null;
+    return page && Date.now() - page.saved < lifetime ? page.html : null;
   }
 
   function remember(url, html) {
@@ -33,16 +34,18 @@
   }
 
   async function prefetch(url) {
-    if (leaving || !url || !canPrefetch() || cached(url) || pending.has(pageKey(url))) return;
+    if (leaving || !url || !canPrefetch() || cached(url, freshFor) || pending.has(pageKey(url))) return;
     const key = pageKey(url);
     const controller = new AbortController();
     pending.set(key, controller);
     window.addEventListener('beforeunload', stopPreloads);
     const timeout = setTimeout(() => controller.abort(), 5000);
     try {
-      const response = await fetch(url, { credentials: 'same-origin', priority: 'low', signal: controller.signal });
+      const response = await fetch(url, { credentials: 'same-origin', cache: 'no-cache', priority: 'low', signal: controller.signal });
       if (response.ok && !response.redirected && response.headers.get('content-type')?.includes('text/html')) {
         remember(url, await response.text());
+      } else if (response.redirected || [404, 410].includes(response.status)) {
+        pages.delete(key); // A known move or removal must use the real destination next time.
       }
     } catch (_) {
       // Offline, blocked or failed preloads never prevent ordinary navigation.
@@ -61,8 +64,11 @@
   function destination(url) {
     const html = cached(url);
     if (!html) return null;
+    // Serve a recent page immediately while refreshing the next visit in the background.
+    prefetch(url);
     const next = new DOMParser().parseFromString(html, 'text/html');
-    if (!next.querySelector('main#main-content') || !next.querySelector('script[src^="/assets/js/navigation.js"]')) return null;
+    if (!next.querySelector('main#main-content') || !next.querySelector('body > .site-nav') ||
+        !next.querySelector('script[src^="/assets/js/navigation.js"]')) return null;
     // Different stylesheet/script URLs indicate a new build: let the browser load it.
     const assets = doc => [...doc.querySelectorAll('head script[src], link[rel="stylesheet"]')]
       .map(node => node.getAttribute('src') || node.getAttribute('href')).join('|');
@@ -101,6 +107,11 @@
     const viewer = next.querySelector('.image-viewer');
     if (viewer) document.body.append(document.importNode(viewer, true));
     document.body.className = next.body.className;
+    const active = next.querySelector('.site-nav [aria-current="page"]')?.getAttribute('href');
+    document.querySelectorAll('.site-nav a').forEach(link => {
+      if (link.getAttribute('href') === active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
     document.head.querySelectorAll(metadata).forEach(node => node.remove());
     next.head.querySelectorAll(metadata).forEach(node => document.head.append(document.importNode(node, true)));
     currentPath = url.pathname;

@@ -42,8 +42,15 @@ async function run() {
             await page.goto(base + '/', { waitUntil: 'load' });
             // Allow the small, idle background loads to finish before testing a warm click.
             await page.waitForTimeout(1500);
+            const navBox = await page.locator('.site-nav').boundingBox();
+            const tabBoxes = await page.locator('.site-nav a').evaluateAll(links => links.map(link => {
+              const { x, y, width, height } = link.getBoundingClientRect();
+              return { x, y, width, height };
+            }));
             await page.evaluate(() => {
               window.navigationTestMarker = 'same document';
+              window.originalNavigation = document.querySelector('.site-nav');
+              window.originalTabs = [...document.querySelectorAll('.site-nav a')];
               window.navigationPaintTimes = [];
               let start;
               document.addEventListener('click', () => { start = performance.now(); }, true);
@@ -61,6 +68,18 @@ async function run() {
               await page.locator('.site-nav [aria-current="page"]').filter({ hasText: name }).waitFor();
               timings.push({ name, milliseconds: Date.now() - start });
               assert.equal(await page.evaluate(() => window.navigationTestMarker), 'same document', `${name} reloads the entire document`);
+              assert.equal(await page.evaluate(() => document.querySelector('.site-nav') === window.originalNavigation &&
+                [...document.querySelectorAll('.site-nav a')].every((link, i) => link === window.originalTabs[i])), true,
+                'page change replaced the shared navigation');
+              const nextBox = await page.locator('.site-nav').boundingBox();
+              for (const key of ['x', 'y', 'width', 'height']) assert.ok(Math.abs(nextBox[key] - navBox[key]) < 1, `${name} moved the navigation ${key}`);
+              const nextTabs = await page.locator('.site-nav a').evaluateAll(links => links.map(link => {
+                const { x, y, width, height } = link.getBoundingClientRect();
+                return { x, y, width, height };
+              }));
+              nextTabs.forEach((box, i) => {
+                for (const key of ['x', 'y', 'width', 'height']) assert.ok(Math.abs(box[key] - tabBoxes[i][key]) < 1, `${name} moved tab ${i}`);
+              });
               assert.equal(await page.locator('.theme-lamp').count(), 1);
               assert.equal(await page.locator('html').getAttribute('data-theme'), theme);
               assert.equal(await page.locator('main').evaluate(e => e === document.activeElement), true, 'focus moves to new content');
@@ -77,6 +96,8 @@ async function run() {
               }
               if (name === 'Projects') assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
               if (name === 'Home') {
+                assert.equal(await page.locator('.role').textContent(), 'Data and Research @ Artemis');
+                assert.ok(!(await page.locator('.about').textContent()).includes('Data and Research @ Artemis'));
                 assert.equal(await page.locator('.profile-portrait').count(), 1);
                 assert.equal(await page.locator('.site-boot').count(), 0);
                 assert.doesNotMatch(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
@@ -188,7 +209,7 @@ async function run() {
           await page.waitForTimeout(1200);
           if (mode === 'expired-cache') await page.evaluate(() => {
             const now = Date.now;
-            Date.now = () => now() + 120_000;
+            Date.now = () => now() + 31 * 60_000;
           });
           if (mode !== 'no-js') await page.evaluate(() => { window.navigationTestMarker = 'must reload'; });
           // Calling the real anchor's click skips hover prefetch, reproducing an immediate tap.
