@@ -7,6 +7,8 @@
   const maxAge = 60_000;
   const metadata = 'title, meta[name], meta[property], link[rel="canonical"], script[type="application/ld+json"]';
   let currentPath = location.pathname;
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let entrance = null;
   const pageKey = url => url.origin + url.pathname;
   const canPrefetch = () => !navigator.connection?.saveData &&
     !['slow-2g', '2g'].includes(navigator.connection?.effectiveType);
@@ -67,7 +69,32 @@
     return assets(next) === assets(document) ? next : null;
   }
 
+  function stopMotion() {
+    entrance?.cancel();
+    entrance = null;
+  }
+
+  function enterPage(main) {
+    if (reducedMotion.matches || document.hidden || document.querySelector('dialog[open]')) return;
+    try {
+      // Animate the live content, so another tap never has to wait for a snapshot.
+      const animation = main.animate([
+        { opacity: 0, transform: 'translateY(6px)' },
+        { opacity: 1, transform: 'translateY(0)' }
+      ], { duration: 240, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+      entrance = animation;
+      animation.finished.catch(() => {}).finally(() => {
+        if (entrance === animation) entrance = null;
+      });
+    } catch (_) {
+      // Older browsers still get the immediate, fully visible page.
+    }
+  }
+  reducedMotion.addEventListener('change', stopMotion);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopMotion(); });
+
   function render(next, url, scroll) {
+    stopMotion();
     document.dispatchEvent(new Event('site:before-render'));
     document.querySelector('main').replaceWith(document.importNode(next.querySelector('main'), true));
     document.querySelector('.image-viewer')?.remove();
@@ -82,6 +109,7 @@
     main.setAttribute('tabindex', '-1');
     main.focus({ preventScroll: true });
     window.scrollTo(...scroll);
+    enterPage(main);
   }
 
   function saveScroll() {
@@ -94,6 +122,12 @@
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const url = localPage(event.target.closest('a[href]'));
     if (!url) return;
+    if (url.pathname === location.pathname && !location.search && !location.hash) {
+      event.preventDefault();
+      stopMotion();
+      window.scrollTo(0, 0);
+      return;
+    }
     const next = destination(url);
     if (!next) return;
     event.preventDefault();
@@ -120,6 +154,7 @@
 
   function stopPreloads() {
     leaving = true;
+    stopMotion();
     if ('cancelIdleCallback' in window) cancelIdleCallback(warmTask);
     else clearTimeout(warmTask);
     warmTask = null;
