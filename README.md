@@ -47,6 +47,8 @@ GitHub Pages must use **GitHub Actions** as its build source, with `limzhengjie.
 
 The sitemap advertises eight canonical pages, the portrait and four original infographics. Robots allows crawling; Projects, Me as a person and the 404 page carry `noindex`. Article schema points to the original publishers. Indexable pages have self canonicals, unique titles and descriptions, social metadata and appropriate structured data. See [the SEO audit and Search Console checklist](docs/seo.md) for verification status. Deployment does not establish Google indexing.
 
+GitHub Pages serves the canonical site at `limzhengjie.com`. Vercel serves previews and the spark API. `vercel.json` adds `X-Robots-Tag: noindex` only on `*.vercel.app`, so the alternate site copies stay out of search without blocking the canonical domain or redirecting the API.
+
 The SEO suite checks sitemap coverage, crawl directives, metadata, social-image dimensions and alt descriptions, responsive image paths, structured data, and content hashes for versioned shared assets. The browser suite also checks the 404 layout in both themes and at enlarged text sizes.
 
 To refresh the homepage/Writing social preview after changing the profile, run `node scripts/social-image.cjs` with Playwright Chromium installed. It renders the approved portrait and site typography to `assets/brand/zheng-jie-lim-social.png`, with `og-image.png` retained as a legacy copy. Set `CHROMIUM_EXECUTABLE_PATH` and `PLAYWRIGHT_MODULE` when using a bundled runtime. New artwork should use a new metadata URL when an already-shared preview must be refreshed; social platforms control their own caches.
