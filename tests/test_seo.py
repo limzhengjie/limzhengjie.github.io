@@ -231,6 +231,59 @@ class SEOTests(unittest.TestCase):
         self.assertEqual(nodes['ProfilePage']['mainEntity']['@id'], nodes['Person']['@id'])
         self.assertEqual(nodes['WebSite']['url'], SITE + '/')
 
+    def test_image_rights_are_consistent_and_link_to_visible_permission_details(self):
+        def image_objects(value):
+            if isinstance(value, dict):
+                if value.get('@type') == 'ImageObject':
+                    yield value
+                for child in value.values():
+                    yield from image_objects(child)
+            elif isinstance(value, list):
+                for child in value:
+                    yield from image_objects(child)
+
+        rights_by_image = {}
+        occurrences = {}
+        for url, html in self.html.items():
+            # The gallery embeds images inside ItemList entries, while detail
+            # pages put them at the graph root. Both occurrences need rights.
+            blocks = re.findall(r'<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>', html, re.S)
+            visible = re.sub(r'<script\b[^>]*>.*?</script>', '', html, flags=re.S)
+            visible = unescape(re.sub(r'<[^>]+>', ' ', visible))
+            for block in blocks:
+                for node in image_objects(json.loads(block)):
+                    with self.subTest(page=url, image=node['contentUrl']):
+                        notice = node.get('copyrightNotice', '')
+                        self.assertTrue(notice.strip(), 'Image copyright notice is required')
+                        self.assertIn('Zheng Jie Lim', notice)
+                        self.assertIn(notice, visible)
+                        rights = [notice]
+                        for field in ('license', 'acquireLicensePage'):
+                            target = node.get(field, '')
+                            parsed = urlsplit(target)
+                            self.assertEqual(parsed.scheme, 'https')
+                            self.assertEqual(parsed.netloc, urlsplit(SITE).netloc)
+                            self.assertTrue(local_path(target).is_file(), target)
+                            landing_html = local_path(target).read_text()
+                            landing = Page(landing_html)
+                            self.assertTrue(parsed.fragment, 'Link directly to the image-use details')
+                            self.assertIn(parsed.fragment, [a.get('id') for _, a in landing.elements])
+                            self.assertIn(notice, unescape(landing_html))
+                            self.assertTrue(any(a.get('href', '').startswith('mailto:limzhengjiework@gmail.com')
+                                                for a in landing.attrs('a')))
+                            rights.append(target)
+                        source = node['contentUrl']
+                        self.assertEqual(rights_by_image.setdefault(source, rights), rights)
+                        occurrences.setdefault(source, set()).add(url)
+        gallery = SITE + '/designs/'
+        originals = {urljoin(gallery, a['href']) for a in self.pages[gallery].attrs('a')
+                     if a.get('class') == 'design-open'}
+        self.assertTrue(originals)
+        self.assertEqual(set(rights_by_image), originals)
+        for source, pages in occurrences.items():
+            self.assertIn(gallery, pages)
+            self.assertEqual(len(pages), 2, source)
+
     def test_small_wins_schema_matches_visible_sources_and_dates(self):
         url = SITE + '/small-wins/'
         html = self.html[url]  # The page must be included in the indexable sitemap.
