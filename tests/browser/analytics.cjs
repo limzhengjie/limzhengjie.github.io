@@ -165,6 +165,27 @@ async function run() {
         assert.deepEqual(links.errors, []);
       } finally { await links.context.close(); }
 
+      const motion = await fixture(browser, { context: { reducedMotion: 'no-preference' } });
+      try {
+        await motion.context.addInitScript(() => localStorage.setItem('zj-intro-seen', '1'));
+        await motion.page.goto(site);
+        await motion.waitForCount(1);
+        await motion.page.waitForTimeout(500);
+        for (const [route, count] of [['/writing/', 3], ['/designs/', 5], ['/projects/', 7], ['/', 9]]) {
+          await motion.page.locator(`.site-nav a[href="${route}"]`).click();
+          await motion.page.waitForURL(site + route);
+          await motion.waitForCount(count);
+          assert.equal(motion.events[count - 1].url, route);
+          assert.equal(motion.events[count - 2].name, 'navigation_click');
+          assert.equal(motion.events[count - 2].url, motion.events[count - 3].url);
+        }
+        await motion.page.waitForTimeout(350);
+        assert.deepEqual(motion.events.filter(event => !event.name).map(event => event.url),
+          ['/', '/writing/', '/designs/', '/projects/', '/']);
+        assert.equal(motion.documents.length, 1);
+        assert.deepEqual(motion.errors, []);
+      } finally { await motion.context.close(); }
+
       for (const test of ['preview', 'localhost', 'opt-out', 'do-not-track', 'global-privacy-control', 'blocked-storage']) {
         const f = await fixture(browser);
         try {

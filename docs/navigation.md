@@ -2,7 +2,11 @@
 
 The original navigation used a new document request on every tab click. In a September 13, 2026 production sample, first visits to Writing and Designs waited roughly 50–90 ms for HTML, then parsed the page and loaded page-specific assets. Fetching HTML ahead of time avoided the document transfer in Chromium, but WebKit still requested it on navigation.
 
-`assets/js/navigation.js` now fetches the three other navigation pages at low priority after the current page loads. Hover, keyboard focus and touch can also warm an internal page. A completed, recent preload allows a synchronous content change without replacing the document, stylesheet or lamp. There is no loading animation or transition delay.
+`assets/js/navigation.js` fetches the three other navigation pages at low priority after the current page loads. Hover, keyboard focus and touch can also warm an internal page. A completed, recent preload allows a content change without replacing the document, stylesheet or lamp. Navigation never waits for a fade-out or a network request.
+
+Cached page changes introduce the new content with a 240 ms fade and a 6 px upward settle, using Web Animations. The live main landmark stays interactive throughout; the lamp and background persist outside the animation. Content, URL, focus, metadata and analytics update synchronously, with no outgoing-animation delay. Another click immediately replaces the page and cancels the old effect. Browser Back/Forward uses the same entrance and restores the saved reading position.
+
+Reduced motion skips the effect. Motion is canceled when the preference changes or the document is hidden. Unsupported or failed animation calls leave the new page fully visible. Clicking the current tab returns to the top without animating or creating another pageview. The first-visit introduction keeps its own animation; neither it nor network loading is extended by page transitions.
 
 The enhancement keeps real, crawlable HTML links. An unfinished, failed, expired, redirected or incompatible preload falls back to ordinary browser navigation immediately. Query strings, hashes, external links, downloads, new tabs and modified clicks keep native behavior. Saving data or a reported 2G connection disables preloading. Background requests are aborted when leaving the document.
 
@@ -19,5 +23,7 @@ Each content change updates the title, description, robots directives, canonical
 - Theme changes, infographic viewing/zoom, first-visit intro cleanup, back/forward and restored reading positions.
 - No JavaScript, blocked navigation script, failed/pending preloads, data saving and expired cache all retain ordinary navigation.
 - Modified clicks, external links, downloads, image files, hashes and query strings are not intercepted.
+
+`tests/browser/transitions.cjs` checks motion-enabled navigation in both engines, themes and viewports: all outward/return trips, a real pointer click during a paused entrance, rapid successive clicks, uninterrupted lamp motion, Back/Forward reading positions, runtime reduced-motion changes, and missing/failed animation APIs. The analytics suite also exercises the animated route sequence and checks one correctly attributed pageview per destination. These checks mock the spark and analytics endpoints.
 
 The regression failed before the fix with `Writing reloads the entire document`. The test server adds 180 ms to HTML responses so eliminating a document request has a meaningful benefit even on a local machine. Timing output measures click-event to the next animation frame and is diagnostic, not a universal speed guarantee.
