@@ -211,6 +211,15 @@ class SEOTests(unittest.TestCase):
                     self.assertEqual(version, [digest], f'{url}: stale asset URL {ref}')
         self.assertTrue(all(refs == signatures[0] for refs in signatures), 'Shared asset URLs must agree for cached navigation')
 
+    def test_search_keeps_every_article_in_initial_html(self):
+        page = self.pages[SITE + '/writing/']
+        self.assertEqual(len([a for a in page.attrs('article') if a.get('class') == 'writing-card']), 32)
+        for tag in ['section', 'li', 'article']:
+            self.assertTrue(all('hidden' not in a for a in page.attrs(tag)), 'Search must not hide source articles')
+        form = next(a for a in page.attrs('form') if a.get('id') == 'writing-search')
+        self.assertIn('hidden', form, 'Only reveal search after its script initializes')
+        self.assertNotIn('action', form, 'Do not create crawlable empty search-result URLs')
+
     def test_structured_data_matches_page_identity_and_images(self):
         for url, html in self.html.items():
             blocks = re.findall(r'<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>', html, re.S)

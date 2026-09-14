@@ -2,6 +2,14 @@
 
 The site should help people find Zheng Jie Lim and his research on crypto, fintech and investing. Preserve the minimal design; give individual work useful context on its own page rather than filling the homepage or gallery with keyword lists.
 
+## September 14: crawlability and browsing follow-up
+
+A fresh production crawl found all eight sitemap pages reachable through initial HTML links within two clicks of Home. They returned 200 with unique titles/descriptions, self canonicals, valid JSON-LD and no indexing block. All 19 inspected image/script/style assets loaded. Canonical host variants, the real 404, and Me/Projects/Vercel exclusions behaved as intended.
+
+Search Console now reports the sitemap as **Success**, last read September 14, with **eight discovered pages**. Individual inspections confirm **Home and Writing are indexed**. The broader Page indexing report is still processing; this does not establish that the other six pages are indexed. No duplicate indexing requests were submitted in this follow-up.
+
+Writing search filters the existing 32 articles in the browser. The complete titles, summaries, outbound links and structured data remain in the initial HTML; the form is hidden if its script cannot initialize. Search does not create URL parameters or additional result pages. Gallery arrows/swipes preserve the static original-image links and research detail pages. Both enhancements reinitialize when returning through cached navigation. Search terms stay in the browser; gallery advances count as the existing `infographic_open` analytics event.
+
 ## September 14, 2026 follow-up
 
 PR #20 is merged and published. The live crawl checked all eight indexable pages plus Me and Projects. Every page returned 200 with its intended canonical and indexing policy; all linked internal pages and fetched assets loaded successfully. HTTP, www, github.io and slashless Small Wins URLs redirect permanently to the HTTPS canonical. Unknown URLs return a real 404. Explicit `index.html` variants still use the clean directory canonical, as expected on GitHub Pages.

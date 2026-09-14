@@ -137,6 +137,13 @@
     }, { capture: true, passive: true });
   }
   document.addEventListener('site:load', () => pageview());
+  document.addEventListener('site:infographic-view', event => {
+    try {
+      const url = new URL(event.detail.url);
+      if (url.origin !== location.origin || !url.pathname.startsWith('/assets/designs/')) return;
+      send({ ...snapshot(), name: 'infographic_open', data: { image: url.pathname.split('/').pop() } });
+    } catch (_) { /* Tracking must never interrupt the viewer. */ }
+  });
   window.addEventListener('pageshow', event => { if (event.persisted) pageview(true); });
   pageview();
 
