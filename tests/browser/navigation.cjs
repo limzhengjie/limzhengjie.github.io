@@ -51,7 +51,7 @@ async function run() {
                 window.navigationPaintTimes.push(Math.round(performance.now() - start))));
             });
             const timings = [];
-            for (const [name, route] of [['Writing', '/writing/'], ['Designs', '/designs/'], ['Projects', '/projects/'], ['Home', '/']]) {
+            for (const [name, route] of [['Writing', '/writing/'], ['Designs', '/designs/'], ['Projects', '/projects/'], ['Small Wins', '/small-wins/'], ['Home', '/']]) {
               const link = page.locator('.site-nav').getByRole('link', { name, exact: true });
               const start = Date.now();
               if (width === 390) await link.tap(); else { await link.focus(); await page.keyboard.press('Enter'); }
@@ -73,7 +73,7 @@ async function run() {
                 await page.keyboard.press('Escape');
                 await page.waitForFunction(() => !document.body.classList.contains('viewer-open'));
               }
-              if (name === 'Projects') assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
+              if (name === 'Projects' || name === 'Small Wins') assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
               if (name === 'Home') {
                 assert.equal(await page.locator('.profile-portrait').count(), 1);
                 assert.equal(await page.locator('.site-boot').count(), 0);

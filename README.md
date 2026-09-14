@@ -7,6 +7,8 @@ Static personal website at [limzhengjie.com](https://limzhengjie.com/), publishe
 - `/designs/`: four dated infographics in a minimal image grid. Click a preview for a full-image viewer with zoom and an original-image link. The portfolio is indexable and included in the sitemap.
 - `/designs/<subject>/`: individual research graphics with a summary, data date, source credits and reporting context. Gallery titles link to these pages while image clicks keep opening the viewer.
 - `/projects/`: a coming-soon page, deliberately excluded from indexing until it contains work.
+- `/small-wins/`: small wins in life. A `Small Wins` navigation tab; coming-soon and excluded from indexing until it contains entries.
+- `/me/`: me as a person, a short list of traits. Reached from the homepage rather than the navigation, so the tab row stays short; excluded from indexing for now.
 - `404.html`: a themed error page with navigation back into the site; GitHub Pages serves it with HTTP 404 for unknown URLs.
 
 All pages include their content and navigation in the initial HTML and work without JavaScript. With JavaScript, the homepage shows the approved six-second full-screen introduction once per browser. X or Escape dismisses it immediately; reduced-motion preferences skip it. The hanging lamp switches between saved light and dark themes. Cached navigation makes warmed page links immediate, with ordinary navigation as the fallback. Designs enhances its image links with a full-image viewer.

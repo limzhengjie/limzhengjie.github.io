@@ -43,7 +43,7 @@ class SEOTests(unittest.TestCase):
         cls.html = {url: local_path(url).read_text() for url in cls.urls}
         cls.pages = {url: Page(html) for url, html in cls.html.items()}
         cls.public_pages = dict(cls.pages)
-        for path in ['projects/index.html', '404.html']:
+        for path in ['projects/index.html', 'small-wins/index.html', 'me/index.html', '404.html']:
             cls.public_pages[SITE + '/' + path.replace('index.html', '')] = Page((ROOT / path).read_text())
 
     def test_sitemap_pages_have_unique_metadata_and_self_canonicals(self):
@@ -102,8 +102,12 @@ class SEOTests(unittest.TestCase):
 
     def test_public_page_inventory_has_an_explicit_indexing_policy(self):
         files = set(ROOT.glob('*.html'))
-        for folder in ['writing', 'designs', 'projects']:
-            files.update((ROOT / folder).rglob('*.html'))
+        # Discover, do not enumerate. A hand-listed set stops where its author
+        # stopped looking, and a new page folder would silently skip this contract.
+        for folder in sorted(p for p in ROOT.iterdir() if p.is_dir()
+                             and not p.name.startswith('.')
+                             and p.name not in {'assets', 'data', 'docs', 'scripts', 'tests', 'templates', 'api', 'node_modules'}):
+            files.update(folder.rglob('*.html'))
         eligible = set()
         for file in files:
             page = Page(file.read_text())
@@ -116,7 +120,7 @@ class SEOTests(unittest.TestCase):
                 self.assertEqual(len(canonical), 1, file)
                 eligible.add(canonical[0])
         self.assertEqual(eligible, set(self.urls), 'An indexable page is missing from the sitemap')
-        for path in ['/projects/', '/404.html']:
+        for path in ['/projects/', '/small-wins/', '/me/', '/404.html']:
             page = self.public_pages[SITE + path]
             self.assertIn('noindex', next(a['content'] for a in page.attrs('meta') if a.get('name') == 'robots'))
         self.assertFalse([a for a in self.public_pages[SITE + '/404.html'].attrs('link') if a.get('rel') == 'canonical'])
