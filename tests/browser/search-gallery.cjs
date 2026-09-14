@@ -131,7 +131,14 @@ async function run() {
               await fs.mkdir(process.env.GALLERY_ARTIFACT_DIR, { recursive: true });
               await page.screenshot({ path: path.join(process.env.GALLERY_ARTIFACT_DIR, `${engine}-${theme}-${width}-viewer.png`) });
             }
+            // Dialog close events are queued. Wait for the handler before
+            // checking restored focus, rather than racing the browser task.
+            await page.evaluate(() => {
+              window.galleryClosed = new Promise(resolve => document.querySelector('.image-viewer')
+                .addEventListener('close', () => resolve(true), { once: true }));
+            });
             await page.keyboard.press('Escape');
+            await page.evaluate(() => window.galleryClosed);
             assert.equal(await page.locator('.design-open').nth(finalIndex).evaluate(el => el === document.activeElement), true);
             await page.locator('.site-nav a[href="/writing/"]').click();
             await page.waitForURL(base + '/writing/');
