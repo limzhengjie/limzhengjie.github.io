@@ -53,7 +53,7 @@ async function run() {
             const timings = [];
             // Home goes last, and the back/forward checks after this loop assume the tab
             // visited just before it is Projects. Insert new tabs ahead of Projects.
-            for (const [name, route] of [['Small Wins', '/small-wins/'], ['Writing', '/writing/'], ['Designs', '/designs/'], ['Projects', '/projects/'], ['Home', '/']]) {
+            for (const [name, route] of [['Writing', '/writing/'], ['Designs', '/designs/'], ['Projects', '/projects/'], ['Home', '/']]) {
               const link = page.locator('.site-nav').getByRole('link', { name, exact: true });
               const start = Date.now();
               if (width === 390) await link.tap(); else { await link.focus(); await page.keyboard.press('Enter'); }
@@ -75,7 +75,7 @@ async function run() {
                 await page.keyboard.press('Escape');
                 await page.waitForFunction(() => !document.body.classList.contains('viewer-open'));
               }
-              if (name === 'Projects' || name === 'Small Wins') assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
+              if (name === 'Projects') assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
               if (name === 'Home') {
                 assert.equal(await page.locator('.profile-portrait').count(), 1);
                 assert.equal(await page.locator('.site-boot').count(), 0);
@@ -103,6 +103,24 @@ async function run() {
             await page.waitForFunction(y => Math.abs(scrollY - y) < 3, previousScroll);
             assert.deepEqual(errors, []);
             console.log(`${engine} ${theme} ${width}px: no-reload navigation, viewer, metadata, theme, history and scroll passed; click-to-frame ms:`, JSON.stringify(await page.evaluate(() => window.navigationPaintTimes.slice(0, 4))));
+            await page.locator('.site-nav a[href="/"]').click();
+            await page.waitForURL(base + '/');
+            // Personal pages belong below the About copy, outside the primary tabs.
+            assert.equal(await page.locator('.site-nav a[href="/small-wins/"]').count(), 0);
+            const wins = page.locator('.about a[href="/small-wins/"]');
+            assert.equal(await wins.evaluate(link => Boolean(
+              document.querySelector('.about a[href="/me/"]').compareDocumentPosition(link)
+                & Node.DOCUMENT_POSITION_FOLLOWING)), true);
+            await wins.click();
+            await page.waitForURL(base + '/small-wins/');
+            await page.getByRole('heading', { name: 'Small wins in life', exact: true }).waitFor();
+            assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
+            assert.equal(await page.locator('.site-nav a[href="/small-wins/"]').count(), 0);
+            assert.equal(await page.locator('html').getAttribute('data-theme'), chosen);
+            await page.goBack();
+            await page.waitForURL(base + '/');
+            await page.locator('.profile-portrait').waitFor();
+            assert.deepEqual(errors, []);
             await context.close();
           }
         }

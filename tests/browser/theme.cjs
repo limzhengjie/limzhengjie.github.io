@@ -8,9 +8,8 @@ const root = path.resolve(__dirname, '../..');
 const routes = ['/', '/writing/', '/designs/', '/projects/', '/small-wins/', '/me/',
   '/designs/ai-adoption/', '/designs/cxmt-price-discovery/',
   '/designs/agentic-payments/', '/designs/revenue-per-employee/', '/missing-page/'];
-// One list, checked on every page. Two hardcoded copies is how a fifth tab
-// reached production in theme.cjs while navigation.cjs already knew about it.
-const NAV_LABELS = ['Home', 'Writing', 'Designs', 'Projects', 'Small Wins'];
+// Keep the main navigation consistent on every page, including personal pages.
+const NAV_LABELS = ['Home', 'Writing', 'Designs', 'Projects'];
 const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon' };
 const opposite = theme => theme === 'dark' ? 'light' : 'dark';
