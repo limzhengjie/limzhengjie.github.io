@@ -57,6 +57,8 @@ To refresh the homepage/Writing social preview after changing the profile, run `
 
 Designs contains static snapshots supplied by Zheng Jie, newest first. Visible dates describe each graphic's data period, not a live refresh or publication date. The original PNGs in `assets/designs/` are unchanged; 800px and 1600px WebP copies provide smaller responsive previews. Only the first preview loads eagerly. Each image is a direct link to its original PNG, enhanced by `assets/js/designs.js` with an accessible native dialog, fit/zoom controls, Escape-to-close and focus restoration. Without JavaScript, or when opening a link in another tab, visitors go directly to the original. Original branding and source notes remain in the artwork; CollectionPage / ItemList / ImageObject schema describes the displayed work.
 
+Zheng Jie owns the four infographics. Their gallery and detail-page ImageObject entries include the same copyright notice, rights URL and permission-request URL. The compact image-use note at `/designs/#image-use` reserves rights and links to his public email for reuse requests. New images need accurate ownership information in both visible text and every schema occurrence.
+
 Infographic statistics do not auto-update. To add a piece, copy its original and preview assets, add the gallery entry and a detail page, and update matching schema and sitemap entries. Keep historical reporting periods and estimates explicit. Each detail page has its own canonical URL, title, description, social image and image sitemap entry.
 
 ## SEO maintenance

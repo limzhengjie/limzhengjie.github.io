@@ -715,7 +715,8 @@ body.page-writing {
   margin: 0 0 1rem;
 }
 
-.research-context a {
+.research-context a,
+.gallery-note a {
   color: var(--fg);
   text-underline-offset: 0.2em;
 }
