@@ -26,6 +26,9 @@ async function run() {
           const file = path.resolve(root, '.' + url.pathname + (url.pathname.endsWith('/') ? 'index.html' : ''));
           assert.ok(file.startsWith(root + path.sep));
           let body = await fs.readFile(file), status = 200;
+          if (!stale && url.pathname === '/projects/' && req.resourceType() === 'fetch') {
+            await new Promise(resolve => setTimeout(resolve, 700));
+          }
           if (stale && url.pathname === '/projects/') {
             if (req.resourceType() === 'fetch') {
               requests++;
@@ -54,7 +57,9 @@ async function run() {
         page.on('request', r => { if (r.isNavigationRequest()) documents.push(r.url()); });
         try {
           await page.goto(base + '/', { waitUntil: 'load' });
-          await page.waitForTimeout(500);
+          // Begin the long read after the idle preload has actually completed.
+          await page.waitForFunction(() => performance.getEntriesByName(location.origin + '/projects/')
+            .some(entry => entry.initiatorType === 'fetch' && entry.responseEnd > 0));
           stale = true;
           const result = await page.evaluate(() => {
             window.cacheTestMarker = 'same document';
