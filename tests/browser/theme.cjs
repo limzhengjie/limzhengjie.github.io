@@ -5,9 +5,12 @@ const http = require('node:http');
 const path = require('node:path');
 const playwright = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(__dirname, '../..');
-const routes = ['/', '/writing/', '/designs/', '/projects/',
+const routes = ['/', '/writing/', '/designs/', '/projects/', '/small-wins/', '/me/',
   '/designs/ai-adoption/', '/designs/cxmt-price-discovery/',
   '/designs/agentic-payments/', '/designs/revenue-per-employee/', '/missing-page/'];
+// One list, checked on every page. Two hardcoded copies is how a fifth tab
+// reached production in theme.cjs while navigation.cjs already knew about it.
+const NAV_LABELS = ['Home', 'Writing', 'Designs', 'Projects', 'Small Wins'];
 const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon' };
 const opposite = theme => theme === 'dark' ? 'light' : 'dark';
@@ -144,7 +147,7 @@ async function run() {
               await page.keyboard.press('Space');
               await expectTheme(page, initial);
               assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), route);
-              assert.deepEqual(await page.locator('.site-nav a').allTextContents(), ['Home', 'Writing', 'Designs', 'Projects']);
+              assert.deepEqual(await page.locator('.site-nav a').allTextContents(), NAV_LABELS);
               cases++;
             }
           }
