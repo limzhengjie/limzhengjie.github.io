@@ -2,6 +2,27 @@
 
 The site should help people find Zheng Jie Lim and his research on crypto, fintech and investing. Preserve the minimal design; give individual work useful context on its own page rather than filling the homepage or gallery with keyword lists.
 
+## September 14, 2026 follow-up
+
+PR #20 is merged and published. The live crawl checked all eight indexable pages plus Me and Projects. Every page returned 200 with its intended canonical and indexing policy; all linked internal pages and fetched assets loaded successfully. HTTP, www, github.io and slashless Small Wins URLs redirect permanently to the HTTPS canonical. Unknown URLs return a real 404. Explicit `index.html` variants still use the clean directory canonical, as expected on GitHub Pages.
+
+The public Vercel production alias also served the site with indexable HTML and no `X-Robots-Tag`. `vercel.json` now adds `X-Robots-Tag: noindex` only when the host ends in `.vercel.app`. This excludes alternate deployment copies while keeping `limzhengjie.com` eligible, preserving preview access and leaving the spark API route intact. A regression rejects both a missing exclusion and an unscoped rule that could block the canonical host. The GitHub Pages publishing artifact does not include this Vercel-only configuration.
+
+The 50 outbound references were checked: 46 returned 200, three Forbes articles returned automated-access 403 responses, and LinkedIn returned 999. The Forbes sources were verified during PR #20; these access restrictions are not evidence of dead links. The x402 whitepaper link redirects successfully to its publisher's current PDF. No broken external destination was confirmed.
+
+Search Console was inspected in the signed-in domain property on September 14:
+
+- Writing now reports **URL is on Google / Page is indexed**. Its earlier request was not repeated.
+- Small Wins and the agentic-payments infographic report **Discovered – currently not indexed**. Google accepted one indexing request for each after testing the live URL.
+- The updated eight-page sitemap was submitted successfully. At submission, Google's last processed count was still seven from September 13; submission is not immediate processing or indexing.
+- The overview reports zero web-search clicks and no experience data yet; the broader indexing report is still processing. These are early reports, not a measured traffic baseline.
+- Both the manual-actions and security-issues reports say **No issues detected**.
+- Image metadata reports **seven valid items, zero invalid items**, with the three non-critical copyright/license suggestions. Ownership of the four Artemis-branded graphics is still awaiting confirmation; no rights or reuse permission has been invented. Do not start warning validation until accurate metadata has actually been published.
+
+The approved page design, full-resolution portrait, introduction and historical research graphics are unchanged. The next content improvement is useful original research when available, not adding filler or duplicate copies of publisher articles.
+
+References: [Vercel conditional response headers](https://vercel.com/docs/project-configuration/vercel-json#headers), [Google's HTTP noindex directive](https://developers.google.com/search/docs/crawling-indexing/block-indexing), [image-license metadata](https://developers.google.com/search/docs/appearance/structured-data/image-license-metadata).
+
 ## September 13, 2026 audit
 
 Technical eligibility is verified. Search Console confirms the homepage is indexed; the remaining URLs are being checked individually. Rankings are not established by this audit. Public HTTP requests returned the following results:

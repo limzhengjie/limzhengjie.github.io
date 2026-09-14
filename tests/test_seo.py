@@ -82,6 +82,27 @@ class SEOTests(unittest.TestCase):
                     pending.append(link)
         self.assertEqual(reached, set(self.urls))
 
+    def test_vercel_search_exclusion_does_not_match_the_canonical_domain(self):
+        config = json.loads((ROOT / 'vercel.json').read_text())
+        rules = [rule for rule in config.get('headers', [])
+                 if any(header['key'].lower() == 'x-robots-tag'
+                        and 'noindex' in header['value'].lower()
+                        for header in rule['headers'])]
+        self.assertTrue(rules, 'Public Vercel copies must be excluded from search')
+        for rule in rules:
+            self.assertEqual(rule['source'], '/(.*)')
+            hosts = [condition['value'] for condition in rule.get('has', [])
+                     if condition['type'] == 'host']
+            self.assertTrue(hosts, 'Never apply noindex to every production host')
+            for host in [urlsplit(SITE).netloc, 'www.limzhengjie.com',
+                         'limzhengjie.github.io', 'vercel.app.example.com']:
+                self.assertFalse(any(re.fullmatch(pattern, host) for pattern in hosts), host)
+        for host in ['limzhengjie-github-io.vercel.app',
+                     'limzhengjie-github-preview-123.vercel.app']:
+            self.assertTrue(any(re.fullmatch(condition['value'], host)
+                                for rule in rules for condition in rule['has']
+                                if condition['type'] == 'host'), host)
+
     def test_internal_links_images_and_scripts_exist(self):
         for url, page in self.public_pages.items():
             for tag, attrs in page.elements:
