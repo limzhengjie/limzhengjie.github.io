@@ -82,15 +82,18 @@ async function run() {
               const animation = main.getAnimations()[0];
               window.previousEntrance = animation;
               animation.pause();
-              animation.currentTime = 60;
+              animation.currentTime = 0;
+              const initialOpacity = Number(getComputedStyle(main).opacity);
+              animation.currentTime = 25;
               return { path: location.pathname, duration: animation.effect.getTiming().duration,
-                opacity: Number(getComputedStyle(main).opacity), transform: getComputedStyle(main).transform,
+                initialOpacity, opacity: Number(getComputedStyle(main).opacity), transform: getComputedStyle(main).transform,
                 lampMotion: window.originalLamp.querySelector('.lamp-fixture').getAnimations()[0].playState };
             });
             assert.equal(motion.path, '/writing/', 'page update waited for animation');
-            assert.equal(motion.duration, 240);
-            assert.ok(motion.opacity > 0 && motion.opacity < 1, 'fade is not visible');
-            assert.notEqual(motion.transform, 'none');
+            assert.ok(motion.duration <= 100, 'entrance slows down the page change');
+            assert.ok(motion.initialOpacity >= 0.9, 'new page starts unreadable');
+            assert.ok(motion.opacity > motion.initialOpacity && motion.opacity < 1, 'subtle fade is not visible');
+            assert.equal(motion.transform, 'none', 'page slides instead of appearing in place');
             assert.equal(motion.lampMotion, 'running');
             if (process.env.TRANSITION_ARTIFACT_DIR) {
               await fs.mkdir(process.env.TRANSITION_ARTIFACT_DIR, { recursive: true });
