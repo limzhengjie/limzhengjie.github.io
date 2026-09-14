@@ -4,7 +4,7 @@ The original navigation used a new document request on every tab click. In a Sep
 
 `assets/js/navigation.js` fetches the three other navigation pages at low priority after the current page loads. Hover, keyboard focus and touch can also warm an internal page. A completed, recent preload allows a content change without replacing the document, stylesheet or lamp. Navigation never waits for a fade-out or a network request.
 
-Cached page changes introduce the new content with a 240 ms fade and a 6 px upward settle, using Web Animations. The live main landmark stays interactive throughout; the lamp and background persist outside the animation. Content, URL, focus, metadata and analytics update synchronously, with no outgoing-animation delay. Another click immediately replaces the page and cancels the old effect. Browser Back/Forward uses the same entrance and restores the saved reading position.
+Cached page changes show the new content immediately in its final position, with a 100 ms fade from 90% to full opacity using Web Animations. There is no invisible starting frame or sliding motion. The live main landmark stays interactive throughout; the lamp and background persist outside the animation. Content, URL, focus, metadata and analytics update synchronously, with no outgoing-animation delay. Another click immediately replaces the page and cancels the old effect. Browser Back/Forward uses the same entrance and restores the saved reading position.
 
 Reduced motion skips the effect. Motion is canceled when the preference changes or the document is hidden. Unsupported or failed animation calls leave the new page fully visible. Clicking the current tab returns to the top without animating or creating another pageview. The first-visit introduction keeps its own animation; neither it nor network loading is extended by page transitions.
 
@@ -16,7 +16,7 @@ Each content change updates the title, description, robots directives, canonical
 
 ## Validation
 
-`npm run test:browser` includes the existing 96 layout/theme checks plus `tests/browser/navigation.cjs`:
+`npm run test:browser` includes the existing 132 layout/theme checks plus `tests/browser/navigation.cjs`:
 
 - Chromium and WebKit; 390px touch and 1440px keyboard navigation; light and dark modes.
 - Warm tab changes keep the same document, with correct active navigation, page metadata, photo and Projects noindex handling.

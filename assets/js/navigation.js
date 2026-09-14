@@ -77,11 +77,11 @@
   function enterPage(main) {
     if (reducedMotion.matches || document.hidden || document.querySelector('dialog[open]')) return;
     try {
-      // Animate the live content, so another tap never has to wait for a snapshot.
+      // Keep the new page readable immediately, with no sliding or blank frame.
       const animation = main.animate([
-        { opacity: 0, transform: 'translateY(6px)' },
-        { opacity: 1, transform: 'translateY(0)' }
-      ], { duration: 240, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+        { opacity: 0.9 },
+        { opacity: 1 }
+      ], { duration: 100, easing: 'ease-out' });
       entrance = animation;
       animation.finished.catch(() => {}).finally(() => {
         if (entrance === animation) entrance = null;
