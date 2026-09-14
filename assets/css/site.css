@@ -797,7 +797,8 @@ body.viewer-open {
 }
 
 .viewer-actions button,
-.viewer-actions a {
+.viewer-actions a,
+.viewer-pager button {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -820,7 +821,8 @@ body.viewer-open {
 }
 
 .viewer-actions a:hover,
-.viewer-actions button:hover:not(:disabled) {
+.viewer-actions button:hover:not(:disabled),
+.viewer-pager button:hover {
   background: #2c2c29;
 }
 
@@ -829,6 +831,7 @@ body.viewer-open {
 }
 
 .viewer-actions :focus-visible,
+.viewer-pager :focus-visible,
 .viewer-stage:focus-visible {
   outline: 2px solid #eeebe4;
   outline-offset: -2px;
@@ -841,7 +844,20 @@ body.viewer-open {
   display: flex;
   overflow: auto;
   overscroll-behavior: contain;
+  touch-action: pan-y pinch-zoom;
 }
+
+.viewer-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.25rem 1rem max(0.5rem, env(safe-area-inset-bottom));
+  font: 0.85rem/1.4 "Avenir Next", "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.viewer-pager button { font-size: 1.4rem; }
 
 .viewer-image {
   display: block;
@@ -860,6 +876,7 @@ body.viewer-open {
 
 .viewer-stage.is-zoomed {
   display: block;
+  touch-action: auto;
 }
 
 .viewer-stage.is-zoomed .viewer-image {
@@ -906,6 +923,53 @@ body.viewer-open {
   white-space: nowrap;
   border: 0;
 }
+
+.writing-search {
+  display: flex;
+  align-items: center;
+  margin: 2rem 0 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.writing-search[hidden], .writing-search [hidden] { display: none; }
+
+.writing-search input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg);
+  font: 1rem/1.5 "Avenir Next", "Segoe UI", sans-serif;
+  appearance: none;
+}
+
+.writing-search input::-webkit-search-cancel-button { display: none; }
+.writing-search input::placeholder { color: var(--muted); opacity: 1; }
+.writing-search input:focus-visible { outline: none; }
+.writing-search:focus-within { border-color: var(--fg); }
+
+.writing-search button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: 1.4rem/1 sans-serif;
+  cursor: pointer;
+}
+
+.writing-search button:focus-visible { outline: 2px solid var(--focus); }
+.writing-results {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font: 0.85rem/1.5 "Avenir Next", "Segoe UI", sans-serif;
+}
+.writing-results:empty { display: none; }
 
 .writing-section .section-note {
   margin: 0 0 1rem;

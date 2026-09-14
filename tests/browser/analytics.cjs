@@ -162,6 +162,19 @@ async function run() {
         await links.waitForCount(6);
         assert.equal(links.events[5].name, 'original_image_click');
         assert.equal(links.events[5].data.image, 'ai-adoption.png');
+        await links.page.getByRole('button', { name: 'Next image' }).click();
+        await links.waitForCount(7);
+        assert.equal(links.events[6].name, 'infographic_open');
+        assert.equal(links.events[6].data.image, 'cxmt-price-discovery.png');
+        await links.page.keyboard.press('ArrowRight');
+        await links.waitForCount(8);
+        assert.equal(links.events[7].name, 'infographic_open');
+        await links.page.keyboard.press('Escape');
+        await links.page.goto(site + '/writing/');
+        await links.waitForCount(9);
+        await links.page.getByRole('searchbox').fill('private search query');
+        await links.page.waitForTimeout(200);
+        assert.equal(links.events.length, 9, 'search terms must stay in the browser');
         assert.deepEqual(links.errors, []);
       } finally { await links.context.close(); }
 
