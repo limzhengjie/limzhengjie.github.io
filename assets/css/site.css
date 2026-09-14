@@ -351,6 +351,23 @@ body:has(> .site-boot[open]) {
   list-style: none;
 }
 
+.wins-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wins-list li + li {
+  margin-top: 1.4rem;
+}
+
+.wins-list time {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--muted);
+  font: 0.8rem/1.5 "Avenir Next", "Segoe UI", sans-serif;
+}
+
 .page-placeholder {
   margin: 4rem 0;
   text-align: center;

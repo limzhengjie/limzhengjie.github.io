@@ -114,7 +114,8 @@ async function run() {
             await wins.click();
             await page.waitForURL(base + '/small-wins/');
             await page.getByRole('heading', { name: 'Small wins in life', exact: true }).waitFor();
-            assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
+            assert.doesNotMatch(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
+            assert.equal(await page.locator('.wins-list > li').count(), 4);
             assert.equal(await page.locator('.site-nav a[href="/small-wins/"]').count(), 0);
             assert.equal(await page.locator('html').getAttribute('data-theme'), chosen);
             await page.goBack();

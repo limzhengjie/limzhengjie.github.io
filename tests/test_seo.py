@@ -1,10 +1,12 @@
 """Check crawlable page and asset contracts across the published site."""
+from html import unescape
 from html.parser import HTMLParser
 from datetime import date, datetime, timezone
 import hashlib
 import json
 from pathlib import Path
 import re
+import shlex
 import unittest
 from urllib.parse import parse_qs, urljoin, urlsplit
 from urllib.robotparser import RobotFileParser
@@ -43,7 +45,7 @@ class SEOTests(unittest.TestCase):
         cls.html = {url: local_path(url).read_text() for url in cls.urls}
         cls.pages = {url: Page(html) for url, html in cls.html.items()}
         cls.public_pages = dict(cls.pages)
-        for path in ['projects/index.html', 'small-wins/index.html', 'me/index.html', '404.html']:
+        for path in ['projects/index.html', 'me/index.html', '404.html']:
             cls.public_pages[SITE + '/' + path.replace('index.html', '')] = Page((ROOT / path).read_text())
 
     def test_sitemap_pages_have_unique_metadata_and_self_canonicals(self):
@@ -120,10 +122,28 @@ class SEOTests(unittest.TestCase):
                 self.assertEqual(len(canonical), 1, file)
                 eligible.add(canonical[0])
         self.assertEqual(eligible, set(self.urls), 'An indexable page is missing from the sitemap')
-        for path in ['/projects/', '/small-wins/', '/me/', '/404.html']:
+        for path in ['/projects/', '/me/', '/404.html']:
             page = self.public_pages[SITE + path]
             self.assertIn('noindex', next(a['content'] for a in page.attrs('meta') if a.get('name') == 'robots'))
         self.assertFalse([a for a in self.public_pages[SITE + '/404.html'].attrs('link') if a.get('rel') == 'canonical'])
+
+    def test_deployment_package_includes_every_public_page(self):
+        workflow = (ROOT / '.github/workflows/publish.yml').read_text()
+        copied = re.findall(r'^\s+cp (?:-R )?(.+) _site/$', workflow, re.M)
+        self.assertTrue(copied, 'No public packaging commands found')
+        packaged = set()
+        for command in copied:
+            for source in shlex.split(command):
+                path = ROOT / source
+                self.assertTrue(path.exists(), source)
+                packaged.update(path.rglob('*') if path.is_dir() else [path])
+        for url in self.public_pages:
+            self.assertIn(local_path(url), packaged, f'{url} would be missing after deployment')
+        for url, page in self.public_pages.items():
+            for tag, attrs in page.elements:
+                ref = attrs.get('src') if tag in ('script', 'img') else attrs.get('href') if tag == 'link' else None
+                if ref and urlsplit(urljoin(url, ref)).netloc == urlsplit(SITE).netloc:
+                    self.assertIn(local_path(urljoin(url, ref)), packaged, ref)
 
     def test_search_preview_images_have_real_dimensions_and_descriptions(self):
         for url, page in self.public_pages.items():
@@ -189,6 +209,36 @@ class SEOTests(unittest.TestCase):
         nodes = {n['@type']: n for n in home['@graph']}
         self.assertEqual(nodes['ProfilePage']['mainEntity']['@id'], nodes['Person']['@id'])
         self.assertEqual(nodes['WebSite']['url'], SITE + '/')
+
+    def test_small_wins_schema_matches_visible_sources_and_dates(self):
+        url = SITE + '/small-wins/'
+        html = self.html[url]  # The page must be included in the indexable sitemap.
+        schema = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)[1])
+        collection = next(n for n in schema['@graph'] if n['@type'] == 'CollectionPage')
+        items = collection['mainEntity']['itemListElement']
+        listing = re.search(r'<ol class="wins-list">(.*?)</ol>', html, re.S)[1]
+        rows = re.findall(r'<li>(.*?)</li>', listing, re.S)
+        self.assertGreater(len(rows), 0)
+        self.assertEqual(len(rows), collection['mainEntity']['numberOfItems'])
+        self.assertEqual(len(rows), len(items))
+        dates, sources = [], []
+        for position, (row, item) in enumerate(zip(rows, items), 1):
+            page = Page(row)
+            source = page.attrs('a')[0]['href']
+            label = unescape(re.search(r'<p><a[^>]*>(.*?)</a>', row, re.S)[1])
+            self.assertEqual(item['position'], position)
+            self.assertEqual(item['name'], label)
+            self.assertEqual(item['item'], source)
+            self.assertEqual(urlsplit(source).scheme, 'https')
+            self.assertNotEqual(urlsplit(source).netloc, urlsplit(SITE).netloc)
+            occurred = date.fromisoformat(page.attrs('time')[0]['datetime'])
+            self.assertLessEqual(occurred, datetime.now(timezone.utc).date())
+            dates.append(occurred)
+            sources.append(source)
+        self.assertEqual(dates, sorted(dates, reverse=True))
+        self.assertEqual(len(sources), len(set(sources)))
+        self.assertEqual(collection['about']['@id'], SITE + '/#person')
+        self.assertNotIn('Coming soon', html)
 
     def test_image_sitemap_references_real_originals(self):
         for url in self.sitemap.findall('s:url', NS):
