@@ -25,7 +25,8 @@ async function expectTheme(page, theme) {
 async function expectCenteredIntro(page) {
   const screen = await page.locator('.site-boot').boundingBox();
   assert.ok(await page.locator('.site-boot').evaluate(e => e.matches(':modal')), 'startup must block interaction with the homepage');
-  assert.ok(Math.abs(screen.width - page.viewportSize().width) < 2 && Math.abs(screen.height - page.viewportSize().height) < 2, 'startup does not cover the viewport');
+  assert.ok(Math.abs(screen.width - page.viewportSize().width) < 2 && Math.abs(screen.height - page.viewportSize().height) < 2,
+    `startup ${screen.width}×${screen.height} does not cover the ${page.viewportSize().width}×${page.viewportSize().height} viewport`);
   await page.locator('.boot-console').evaluate(e => Promise.all(e.getAnimations().map(a => a.finished)));
   const box = await page.locator('.boot-console').boundingBox();
   const viewport = page.viewportSize();

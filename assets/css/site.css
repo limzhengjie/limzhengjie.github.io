@@ -163,6 +163,11 @@ body:has(> .site-boot[open]) {
   overflow: hidden;
 }
 
+/* The full-screen introduction has no scrollbar to reserve space for. */
+html:has(.site-boot[open]) {
+  scrollbar-gutter: auto;
+}
+
 .site-boot {
   position: fixed;
   inset: 0;
