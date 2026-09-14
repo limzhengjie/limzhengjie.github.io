@@ -66,3 +66,17 @@ Infographic statistics do not auto-update. To add a piece, copy its original and
 The site is focused on data, research and investing. The homepage uses connected WebSite, ProfilePage and Person structured data; Writing keeps original publisher canonicals and bylines; each infographic detail page includes ImageObject and breadcrumb markup with visible research context. The normal test suite checks crawl paths from the homepage, unique page metadata, canonical URLs, local links and assets, structured data and image sitemap references.
 
 See [the SEO notes](docs/seo.md) for the audit, publication rules and remaining Search Console setup.
+
+## Visitor analytics
+
+[Umami Cloud dashboard](https://cloud.umami.is/analytics/us/websites/18e0df56-605b-4290-a456-65f6b65f6d99) is private to the site owner. The US-region Hobby plan is free, with 100,000 events per month and six months of retention as shown during setup on September 14, 2026. Search Console remains the source for Google search queries and impressions. Umami starts collecting new activity after installation; it cannot reconstruct past visits.
+
+`assets/js/analytics.js` runs only on `limzhengjie.com`, excluding localhost, GitHub's alternate hostname and Vercel previews. It sends one pageview for each actual page change, including cached navigation and back/forward. The external tracker loads after the site's load event; failures never delay links or break navigation. Requests are asynchronous, and queued events preserve the page and title where they occurred.
+
+Events: `navigation_click`, `article_click`, `infographic_open`, `original_image_click`, `profile_click`, `contact_click` and other `outbound_click` actions. Article events include the public article title, publisher and destination. Email clicks include only the channel label, not the email address or message. Page URLs retain only UTM campaign parameters; other query parameters and fragments are dropped. External referrers are reduced to their origin. The integration does not set custom visitor IDs or enable session recordings.
+
+For shared links, use campaign tags such as `https://limzhengjie.com/?utm_source=linkedin&utm_medium=social&utm_campaign=profile`. Use each platform's name consistently so referrals and campaigns are easy to compare.
+
+To exclude your own browser, open `https://limzhengjie.com/?analytics=off`. The setting is saved locally as `umami.disabled`, and the preference parameter is removed before any tracking. Repeat on each browser or device you use. Open `https://limzhengjie.com/?analytics=on` to re-enable. Do Not Track and Global Privacy Control are also respected. These controls do not change the separate spark counter.
+
+`npm run test:browser` includes adapter tests for attribution, delayed/blocked tracking, cache navigation, browser history, clicks and exclusions. Tests intercept analytics requests so QA does not pollute the dashboard. To verify a downloaded copy of the public Umami SDK against the same tests, set `ANALYTICS_REAL_SDK` to that JavaScript file and run `node tests/browser/analytics.cjs`. Production canaries should opt out or intercept tracking, except for one explicitly labelled ingestion check.
