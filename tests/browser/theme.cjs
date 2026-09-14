@@ -25,7 +25,8 @@ async function expectTheme(page, theme) {
 async function expectCenteredIntro(page) {
   const screen = await page.locator('.site-boot').boundingBox();
   assert.ok(await page.locator('.site-boot').evaluate(e => e.matches(':modal')), 'startup must block interaction with the homepage');
-  assert.ok(Math.abs(screen.width - page.viewportSize().width) < 2 && Math.abs(screen.height - page.viewportSize().height) < 2, 'startup does not cover the viewport');
+  assert.ok(Math.abs(screen.width - page.viewportSize().width) < 2 && Math.abs(screen.height - page.viewportSize().height) < 2,
+    `startup ${screen.width}×${screen.height} does not cover the ${page.viewportSize().width}×${page.viewportSize().height} viewport`);
   await page.locator('.boot-console').evaluate(e => Promise.all(e.getAnimations().map(a => a.finished)));
   const box = await page.locator('.boot-console').boundingBox();
   const viewport = page.viewportSize();
@@ -133,6 +134,7 @@ async function run() {
           page.on('pageerror', error => errors.push(error.message));
           for (const width of [390, 1440]) {
             await page.setViewportSize({ width, height: 900 });
+            let navBox;
             for (const route of routes) {
               const response = await page.goto(base + route, { waitUntil: 'load' });
               assert.equal(response.status(), route === '/missing-page/' ? 404 : 200, route);
@@ -147,16 +149,26 @@ async function run() {
               await expectTheme(page, initial);
               assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), route);
               assert.deepEqual(await page.locator('.site-nav a').allTextContents(), NAV_LABELS);
+              const box = await page.locator('.site-nav').boundingBox();
+              navBox ||= box;
+              for (const key of ['x', 'y', 'width', 'height']) assert.ok(Math.abs(box[key] - navBox[key]) < 1, `${route}: navigation ${key} shifted`);
+              const lamp = await page.locator('.theme-lamp').boundingBox();
+              assert.ok(box.x + box.width <= lamp.x || box.x >= lamp.x + lamp.width || box.y >= lamp.y + lamp.height,
+                `${route}: lamp overlaps the navigation`);
               cases++;
             }
           }
           // The author/date line must wrap when readers enlarge their text.
           await page.setViewportSize({ width: 320, height: 568 });
+          let enlargedNav;
           for (const route of routes) {
             await page.goto(base + route, { waitUntil: 'load' });
             await page.addStyleTag({ content: 'html { font-size: 200%; }' });
             assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
               `${engine} ${initial} ${route}: horizontal overflow at 200% text`);
+            const box = await page.locator('.site-nav').boundingBox();
+            enlargedNav ||= box;
+            for (const key of ['x', 'y', 'width', 'height']) assert.ok(Math.abs(box[key] - enlargedNav[key]) < 1, `${route}: enlarged navigation ${key} shifted`);
             cases++;
           }
           await page.goto(base + '/designs/', { waitUntil: 'load' });
