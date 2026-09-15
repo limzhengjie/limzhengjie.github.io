@@ -43,7 +43,9 @@ async function run() {
               status = 404;
               body = await fs.readFile(path.join(root, '404.html'));
             } else {
-              body = body.toString().replace('<p class="page-placeholder">', '<p class="page-placeholder" data-cache-generation="new">');
+              // Mark the stable page container, independent of its current copy.
+              assert.match(body.toString(), /<main id="main-content">/);
+              body = body.toString().replace('<main id="main-content">', '<main id="main-content" data-cache-generation="new">');
               if (mode === 'new-build') body = body.replace(/navigation\.js\?v=[a-f0-9]+/, 'navigation.js?v=next-build');
             }
           }
