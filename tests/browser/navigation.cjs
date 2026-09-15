@@ -94,7 +94,18 @@ async function run() {
                 await page.keyboard.press('Escape');
                 await page.waitForFunction(() => !document.body.classList.contains('viewer-open'));
               }
-              if (name === 'Projects') assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
+              if (name === 'Projects') {
+                assert.doesNotMatch(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
+                assert.equal(await page.locator('.project-card').count(), 4);
+                assert.deepEqual(await page.locator('.project-link a').evaluateAll(links => links.map(link => link.href)),
+                  ['alpha', 'macro', 'hyperliquid', 'portfolio'].map(slug => `https://zj-portfolio-demos.vercel.app/${slug}/`));
+                assert.equal(await page.locator('iframe').count(), 0);
+                const firstDemo = page.getByRole('link', { name: 'Open Alpha Builder demo', exact: true });
+                await page.keyboard.press('Tab');
+                await firstDemo.focus();
+                assert.ok(await firstDemo.evaluate(link => link.matches(':focus-visible')));
+                assert.ok((await firstDemo.boundingBox()).height >= 44);
+              }
               if (name === 'Home') {
                 assert.equal(await page.locator('.role').textContent(), 'Data and Research @ Artemis');
                 assert.ok(!(await page.locator('.about').textContent()).includes('Data and Research @ Artemis'));

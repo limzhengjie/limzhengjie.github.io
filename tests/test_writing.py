@@ -151,8 +151,8 @@ class SiteTests(unittest.TestCase):
         self.assertIn('content="index, follow, max-image-preview:large"', designs)
         self.assertNotIn('Coming soon.', designs)
         self.assertIn('/designs/', (w.ROOT / 'sitemap.xml').read_text())
-        self.assertIn('content="noindex, follow"', (w.ROOT / 'projects/index.html').read_text())
-        self.assertNotIn('/projects/', (w.ROOT / 'sitemap.xml').read_text())
+        self.assertIn('content="index, follow, max-image-preview:large"', (w.ROOT / 'projects/index.html').read_text())
+        self.assertIn('/projects/', (w.ROOT / 'sitemap.xml').read_text())
 
     def test_sitemap_date_changes_only_for_writing(self):
         xml = (w.ROOT / 'sitemap.xml').read_text()

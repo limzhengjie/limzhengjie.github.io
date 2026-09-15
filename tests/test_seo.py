@@ -143,10 +143,31 @@ class SEOTests(unittest.TestCase):
                 self.assertEqual(len(canonical), 1, file)
                 eligible.add(canonical[0])
         self.assertEqual(eligible, set(self.urls), 'An indexable page is missing from the sitemap')
-        for path in ['/projects/', '/me/', '/404.html']:
+        for path in ['/me/', '/404.html']:
             page = self.public_pages[SITE + path]
             self.assertIn('noindex', next(a['content'] for a in page.attrs('meta') if a.get('name') == 'robots'))
         self.assertFalse([a for a in self.public_pages[SITE + '/404.html'].attrs('link') if a.get('rel') == 'canonical'])
+
+    def test_projects_are_crawlable_and_link_to_the_four_public_demos(self):
+        html = self.html[SITE + '/projects/']
+        page = self.pages[SITE + '/projects/']
+        self.assertNotIn('Coming soon', html)
+        self.assertFalse(page.attrs('iframe'), 'Load demos only when a visitor opens one')
+        names = ['Alpha Builder', 'Macro Lens', 'Hyperliquid', 'Portfolio Tracker']
+        urls = ['https://zj-portfolio-demos.vercel.app/' + slug + '/'
+                for slug in ['alpha', 'macro', 'hyperliquid', 'portfolio']]
+        links = [a for a in page.attrs('a') if a.get('href') in urls]
+        self.assertEqual([a['href'] for a in links], urls)
+        self.assertEqual([a['aria-label'] for a in links], ['Open ' + name + ' demo' for name in names])
+        schema = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)[1])
+        collection = next(n for n in schema['@graph'] if n['@type'] == 'CollectionPage')
+        self.assertEqual(collection['mainEntity']['numberOfItems'], 4)
+        items = collection['mainEntity']['itemListElement']
+        self.assertEqual([item['item']['url'] for item in items], urls)
+        self.assertEqual([item['item']['name'] for item in items], names)
+        self.assertEqual([item['position'] for item in items], [1, 2, 3, 4])
+        self.assertEqual(collection['about']['@id'], SITE + '/#person')
+        self.assertIn('Demos use fictional data', html)
 
     def test_deployment_package_includes_every_public_page(self):
         workflow = (ROOT / '.github/workflows/publish.yml').read_text()
