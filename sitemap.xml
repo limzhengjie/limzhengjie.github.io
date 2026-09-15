@@ -43,4 +43,10 @@
     <loc>https://limzhengjie.com/small-wins/</loc>
     <lastmod>2026-09-14</lastmod>
   </url>
+  <url>
+    <loc>https://limzhengjie.com/projects/</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

@@ -1120,3 +1120,17 @@ body.viewer-open {
     font-size: 0.88rem;
   }
 }
+
+/* Projects keep the same quiet list treatment as Writing. */
+.page-projects .lede { text-align: center; }
+.projects-list { margin: 2.25rem 0 0; padding: 0; list-style: none; }
+.project-card { padding: 1.4rem 0 1.5rem; border-top: 1px solid var(--rule); }
+.project-card h2 { margin: 0.2rem 0 0; font-size: 1.35rem; font-weight: 500; line-height: 1.3; letter-spacing: -0.02em; }
+.project-category, .project-summary, .project-link, .projects-note { font-family: "Avenir Next", "Segoe UI", sans-serif; }
+.project-category { margin: 0; color: var(--muted); font-size: 0.78rem; }
+.project-summary { margin: 0.55rem 0 0; color: var(--muted); font-size: 0.9rem; line-height: 1.55; }
+.project-link { margin: 0.55rem 0 0; font-size: 0.86rem; }
+.project-link a { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; color: var(--fg); text-underline-offset: 0.2em; text-decoration-color: var(--rule); }
+.project-link a:hover { text-decoration-color: currentColor; }
+.project-link a:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: 2px; }
+.projects-note { margin: 0.25rem 0 0; padding-top: 1.2rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.8rem; }
