@@ -11,7 +11,9 @@ const server = http.createServer(async (req, res) => {
   try {
     let pathname = new URL(req.url, 'http://localhost').pathname;
     if (pathname === '/api/spark') {
-      if (failNext) { failNext = false; res.writeHead(503); return res.end('{}'); }
+      // Scrolling to the button can trigger a background GET. This scenario
+      // tests a rejected tap, so only its POST may consume the injected failure.
+      if (failNext && req.method === 'POST') { failNext = false; res.writeHead(503); return res.end('{}'); }
       if (req.method === 'POST') {
         let raw = ''; for await (const chunk of req) raw += chunk;
         const body = JSON.parse(raw);
