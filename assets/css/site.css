@@ -485,6 +485,147 @@ h1 {
   border-radius: 2px;
 }
 
+/* A compact work history; native disclosures also work without JavaScript. */
+.experience {
+  margin-top: 2.35rem;
+  padding-top: 1.35rem;
+  border-top: 1px solid var(--rule);
+  text-align: left;
+  font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+}
+
+.experience h2 {
+  margin: 0 0 0.65rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.experience-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.experience-list > li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.experience-item summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: start;
+  gap: 0.25rem 1rem;
+  padding: 0.85rem 0;
+  cursor: pointer;
+  list-style: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.experience-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.experience-item summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 5px;
+  border-radius: 2px;
+}
+
+.experience-identity {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.experience-company,
+.experience-role {
+  display: block;
+}
+
+.experience-company {
+  color: var(--fg);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.experience-role,
+.experience-dates,
+.experience-item p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.experience-role {
+  margin-top: 0.15rem;
+}
+
+.experience-dates {
+  font-variant-numeric: tabular-nums;
+}
+
+.experience-toggle {
+  position: relative;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-top: 0.3rem;
+  color: var(--muted);
+}
+
+.experience-toggle::before,
+.experience-toggle::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+}
+
+.experience-toggle::before {
+  top: calc(50% - 0.5px);
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.experience-toggle::after {
+  top: 0;
+  left: calc(50% - 0.5px);
+  width: 1px;
+  height: 100%;
+}
+
+.experience-item[open] .experience-toggle::after {
+  display: none;
+}
+
+.experience-item summary:hover .experience-company {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+.experience-item p {
+  margin: 0;
+  padding: 0 1.75rem 0.85rem 0;
+  max-width: 28rem;
+}
+
+@media (max-width: 480px) {
+  .experience-item summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .experience-dates {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .experience-toggle {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
 nav {
   margin-top: 2.35rem;
   padding-top: 1.35rem;
