@@ -112,8 +112,11 @@ class SiteTests(unittest.TestCase):
 
     def test_synced_new_artemis_post_passes_the_search_index_contract(self):
         articles = copy.deepcopy(self.articles)
-        articles.append({**articles[0], 'url': 'https://research.artemis.ai/p/additional-research',
-                         'title': 'Additional research'})
+        urls = {article['url'] for article in articles}
+        number = 1
+        while (url := f'https://research.artemis.ai/p/test-extra-{number}') in urls:
+            number += 1
+        articles.append({**articles[0], 'url': url, 'title': 'Additional research'})
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for folder in ['data', 'writing', 'templates']:

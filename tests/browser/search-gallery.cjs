@@ -75,8 +75,6 @@ async function run() {
             await page.waitForFunction(() => performance.getEntriesByType('resource').some(e =>
               new URL(e.name).pathname === '/designs/' && e.initiatorType === 'fetch' && e.responseEnd > 0));
             await query.fill(searchQuery);
-            await page.waitForFunction(() => performance.getEntriesByName(location.origin + '/designs/')
-              .some(entry => entry.initiatorType === 'fetch' && entry.responseEnd > 0));
             await page.locator('.site-nav a[href="/designs/"]').click();
             await page.waitForURL(base + '/designs/');
             await page.goBack();
