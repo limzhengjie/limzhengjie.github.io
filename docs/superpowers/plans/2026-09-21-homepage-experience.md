@@ -6,7 +6,7 @@
 
 **Content:** Owner-supplied résumé, with Artemis, PayMongo and Fifth Person dates and all locations separately confirmed by the owner. Include only company, role, dates and location:
 
-- Artemis Analytics — Research & Data Engineer — December 2024 – Present — New York / Singapore.
+- Artemis Analytics — FinTech Analyst + Data Engineer — December 2024 – Present — New York / Singapore.
 - PayMongo — Product Intern — April 2024 – September 2024 — Philippines.
 - Fifth Person — Investment Analyst Intern — April 2021 – October 2022 — Singapore.
 - UOB — Software Engineer — February – April 2021 — Singapore.
