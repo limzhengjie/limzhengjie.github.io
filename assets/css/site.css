@@ -548,9 +548,7 @@ h1 {
 }
 
 .experience-identity {
-  flex: 1 1 9rem;
-  min-width: 0;
-  overflow-wrap: anywhere;
+  display: contents;
 }
 
 .experience-company,
@@ -559,6 +557,9 @@ h1 {
 }
 
 .experience-company {
+  flex: 1 1 9rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
   color: var(--fg);
   font-size: 0.95rem;
   font-weight: 500;
@@ -572,7 +573,8 @@ h1 {
 }
 
 .experience-role {
-  margin-top: 0.15rem;
+  flex: 0 0 100%;
+  order: 1;
 }
 
 .experience-dates {
