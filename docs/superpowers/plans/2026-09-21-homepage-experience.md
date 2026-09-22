@@ -1,6 +1,6 @@
 # Homepage Experience Implementation Plan
 
-**Goal:** Add one compact “Experience +” disclosure below the biography and above social links. Opening it reveals the complete work history; there are no nested disclosures.
+**Goal:** Add one compact “Experience +” disclosure below the biography and above social links. The current Artemis role stays visible; opening it reveals four previous roles. There are no nested disclosures.
 
 **Architecture:** A native `details` element and clickable `summary` contain an ordered list rendered in the initial HTML. Scoped CSS uses the existing light/dark palette, a 44px heading target and a brief opening animation that respects reduced-motion preferences. No additional JavaScript or dependencies.
 
@@ -14,8 +14,8 @@
 
 ## Implementation and verification
 
-- [x] Replace individual role disclosures with one section-level disclosure, closed by default. Make the complete heading row clickable; change the plus to a minus when open.
-- [x] Show companies above roles. Align dates right on desktop and beneath the role up to 480px. Preserve readable contrast and keyboard focus.
+- [x] Replace individual role disclosures with one section-level disclosure, closed by default with the current role always visible. Make the summary clickable; change the plus to a minus when open.
+- [x] Show companies above roles. Align dates right on every screen and put spaces around each date separator. Preserve readable contrast and keyboard focus.
 - [x] Keep the whole list in the initial HTML and usable without JavaScript. Use semantic month values for dates. Do not add the source documents or personal contact details to the repository.
 - [x] Refresh shared stylesheet content-hash URLs across pages and the Writing template. Keep the homepage sitemap date accurate.
 - [x] Run all 32 Python site/SEO tests, generated Writing consistency and diff checks.
