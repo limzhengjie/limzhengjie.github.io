@@ -4,13 +4,16 @@
     ? 'https://limzhengjie-github-io.vercel.app/api/spark' : '/api/spark';
   const storageKey = 'zj-spark-session-v1';
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  function pendingBatch(item) {
+    const age = Date.now() - item?.createdAt;
+    return item && /^[a-f0-9-]{36}$/i.test(item.requestId) && Number.isInteger(item.amount) &&
+      item.amount > 0 && item.amount <= 10 && age >= 0 && age < 3600000;
+  }
   let session = { visited: false, queue: [] };
   try {
     const saved = JSON.parse(sessionStorage.getItem(storageKey));
     if (saved?.visited === true && Array.isArray(saved.queue)) {
-      session = { visited: true, queue: saved.queue.filter(item =>
-        /^[a-f0-9-]{36}$/i.test(item.requestId) && Number.isInteger(item.amount) &&
-        item.amount > 0 && item.amount <= 10 && Date.now() - item.createdAt < 3600000).slice(0, 30) };
+      session = { visited: true, queue: saved.queue.filter(pendingBatch).slice(0, 30) };
     }
   } catch (_) { /* Storage is optional; Redis owns the total. */ }
   let total = null, busy = false, reading = false, failure = null, view = null;
@@ -60,6 +63,11 @@
   async function flush() {
     clearTimeout(flushTimer);
     if (busy || failure || !session.queue.length) return;
+    // A tab can stay open beyond the server's deduplication window. Never
+    // resend an expired uncertain write, or replace its ID and count it twice.
+    session.queue = session.queue.filter(pendingBatch);
+    persist();
+    if (!session.queue.length) return refresh();
     busy = true;
     const batch = session.queue[0];
     // Never change a batch after sending it: retries must use the exact same ID and amount.

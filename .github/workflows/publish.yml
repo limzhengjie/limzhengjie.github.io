@@ -15,7 +15,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate:
+    uses: ./.github/workflows/check.yml
   build:
+    needs: validate
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -26,10 +29,6 @@ jobs:
       - uses: actions/setup-python@v7.0.0
         with:
           python-version: '3.12'
-      - name: Validate the committed site
-        run: |
-          python3 -m unittest discover -s tests -v
-          python3 scripts/writing.py --check
       - name: Fetch article metadata and compare with the last deployment
         run: python3 scripts/writing.py --sync --published
       - name: Validate the site before publishing

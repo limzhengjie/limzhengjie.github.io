@@ -1,5 +1,7 @@
 # Search visibility: data, research and investing
 
+Dated audit sections below describe the site at that time. Use **Publishing rules** for current maintenance policy; later releases changed the earlier Projects placeholder and sitemap counts.
+
 The site should help people find Zheng Jie Lim and his research on crypto, fintech and investing. Preserve the minimal design; give individual work useful context on its own page rather than filling the homepage or gallery with keyword lists.
 
 ## September 14: crawlability and browsing follow-up
@@ -64,7 +66,7 @@ The approved full-screen introduction lasts about six seconds on a first visit, 
 - Put actual data dates, estimates and reporting limitations near research graphics. Do not present a historical graphic as current data.
 - Include original image links, descriptive alt text and compressed responsive previews. Add the page and image to the sitemap.
 - Update lastmod when content changes, not on every scheduled run. The writing sync preserves unrelated sitemap entries.
-- Projects is a "Coming soon" placeholder, with `noindex, follow` and no sitemap entry. Add useful project content before removing `noindex` and adding its canonical URL to the sitemap.
+- Projects contains four original project hypotheses with links to synthetic demos. Keep its canonical URL indexable and in the sitemap. Me and the 404 page remain noindex; Vercel preview hosts remain excluded by the host-scoped response header.
 - Run the test suite and browser checks before publishing. The SEO tests cover sitemap pages, Projects and the 404 page; the browser suite includes both themes and 200% text.
 - Prefer specific, natural topic language to keyword repetition. Extra schema fields and word count alone do not establish expertise or guarantee search features.
 

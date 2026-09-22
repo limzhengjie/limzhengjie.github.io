@@ -6,7 +6,7 @@ Static personal website at [limzhengjie.com](https://limzhengjie.com/), publishe
 - `/writing/`: Artemis bylines first, then the latest 25 Learn To Invest articles.
 - `/designs/`: four dated infographics in a minimal image grid. Click a preview for a full-image viewer with zoom and an original-image link. The portfolio is indexable and included in the sitemap.
 - `/designs/<subject>/`: individual research graphics with a summary, data date, source credits and reporting context. Gallery titles link to these pages while image clicks keep opening the viewer.
-- `/projects/`: a coming-soon page, deliberately excluded from indexing until it contains work.
+- `/projects/`: four project hypotheses with links to reproducible synthetic demos; indexable and included in the sitemap.
 - `/small-wins/`: small wins in life: four dated research mentions and appearances, with links to original sources. Linked below the homepage About text; indexable and included in the sitemap.
 - `/me/`: me as a person, a short list of traits. Reached from the homepage rather than the navigation, so the tab row stays short; excluded from indexing for now.
 - `404.html`: a themed error page with navigation back into the site; GitHub Pages serves it with HTTP 404 for unknown URLs.
@@ -25,7 +25,7 @@ Learn To Invest uses WordPress's public posts API for the newest 25 published po
 
 `data/articles.json` and `writing/index.html` are committed reference snapshots. Scheduled updates are deployed artifacts, so they do **not** create commits. `templates/writing.html` is the editable page shell. The generator supplies both the visible cards and JSON-LD from the same records.
 
-Before publishing, the workflow checks source completeness, author filtering, unique HTTPS canonicals, date ordering, summaries, generated output and the test suite. If either source or a check fails, the workflow fails and the last deployed site remains live. The next daily run retries. Failures appear in GitHub Actions; notification delivery follows your GitHub notification settings.
+Before every publication, the workflow reuses the same Python, browser and counter checks as pull requests. Only after they pass does it fetch new writing metadata, then check source completeness, author filtering, unique HTTPS canonicals, date ordering, summaries and generated output again. If either source or a check fails, the workflow fails and the last deployed site remains live. The next daily run retries. Failures appear in GitHub Actions; notification delivery follows your GitHub notification settings.
 
 The live page is used to detect removed Artemis bylines and preserve sitemap `lastmod` on unchanged runs. Dates are not bumped just because the workflow ran. Other sitemap entries remain controlled by the repository. Artemis's archive is an undocumented endpoint; a source format change may require updating the adapter. GitHub may disable schedules in public repositories after 60 days without repository activity; re-enable the workflow in Actions if that happens.
 
@@ -41,11 +41,21 @@ python3 scripts/writing.py --check
 
 For a local preview, run `python3 -m http.server 8000` and visit `http://localhost:8000/`. To match scheduled production behavior, run `python3 scripts/writing.py --sync --published`, which compares against the live site.
 
+After editing shared JavaScript or CSS, refresh its existing versioned references and regenerate Writing:
+
+```sh
+python3 scripts/asset_versions.py
+python3 -m unittest discover -s tests -q
+python3 scripts/writing.py --check
+```
+
+For browser and counter validation, use Node 22, `npm ci`, and `npx playwright install chromium webkit`. The counter tests also require `redis-server` on PATH. Run `npm run test:counter` and `npm run test:browser`; CI installs the Linux browser dependencies automatically. These tests use isolated counter/analytics fixtures.
+
 ## Deployment and indexing
 
 GitHub Pages must use **GitHub Actions** as its build source, with `limzhengjie.com` as the custom domain and HTTPS enforced. The build has read-only repository permissions; the separate deployment job has only `pages: write` and `id-token: write`. Only the public pages, assets and SEO files enter the deployment artifact.
 
-The sitemap advertises eight canonical pages, the portrait and four original infographics. Robots allows crawling; Projects, Me as a person and the 404 page carry `noindex`. Article schema points to the original publishers. Indexable pages have self canonicals, unique titles and descriptions, social metadata and appropriate structured data. See [the SEO audit and Search Console checklist](docs/seo.md) for verification status. Deployment does not establish Google indexing.
+The sitemap advertises nine canonical pages, the portrait and four original infographics. Robots allows crawling; Me as a person and the 404 page carry `noindex`. Projects is indexable. Article schema points to the original publishers. Indexable pages have self canonicals, unique titles and descriptions, social metadata and appropriate structured data. See [the SEO audit and Search Console checklist](docs/seo.md) for verification status. Deployment does not establish Google indexing.
 
 GitHub Pages serves the canonical site at `limzhengjie.com`. Vercel serves previews and the spark API. `vercel.json` adds `X-Robots-Tag: noindex` only on `*.vercel.app`, so the alternate site copies stay out of search without blocking the canonical domain or redirecting the API.
 

@@ -1,11 +1,15 @@
 (() => {
   const initialized = new WeakSet();
+  // Keep the latest query while navigating this document. No URL, storage or
+  // per-keystroke history writes: search stays private and navigation stays fast.
+  let rememberedQuery = '';
   const normalize = value => value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
   function initialize() {
     const form = document.querySelector('#writing-search');
     if (!form || initialized.has(form)) return;
     const input = form.querySelector('input');
+    input.value = rememberedQuery;
     const clear = form.querySelector('button');
     const status = document.querySelector('#writing-results');
     const sections = [...document.querySelectorAll('.writing-section')].map(section => ({
@@ -17,6 +21,7 @@
     }));
 
     function filter() {
+      rememberedQuery = input.value;
       const terms = normalize(input.value).trim().split(/\s+/).filter(Boolean);
       let total = 0;
       sections.forEach(section => {

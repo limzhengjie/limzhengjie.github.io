@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import writing as w
+import test_seo as seo
 
 
 class Elements(HTMLParser):
@@ -108,6 +109,31 @@ class SiteTests(unittest.TestCase):
         raw = [{**a, 'source_summary': 'A sufficiently long publisher description.'} for a in self.articles]
         with patch.object(w, 'artemis_posts', return_value=[a for a in raw if a['source'] == 'artemis'][1:]), patch.object(w, 'lti_posts', return_value=[a for a in raw if a['source'] == 'lti']), self.assertRaises(ValueError):
             w.collect({}, self.articles)
+
+    def test_synced_new_artemis_post_passes_the_search_index_contract(self):
+        articles = copy.deepcopy(self.articles)
+        articles.append({**articles[0], 'url': 'https://research.artemis.ai/p/additional-research',
+                         'title': 'Additional research'})
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for folder in ['data', 'writing', 'templates']:
+                (root / folder).mkdir()
+            for path in ['data/articles.json', 'data/writing-overrides.json', 'writing/index.html',
+                         'templates/writing.html', 'sitemap.xml']:
+                (root / path).write_bytes((w.ROOT / path).read_bytes())
+            with patch.object(w, 'ROOT', root), patch.object(w, 'collect', return_value=articles), \
+                    patch.object(sys, 'argv', ['writing.py', '--sync']):
+                w.main()
+            page = seo.Page((root / 'writing/index.html').read_text())
+            contract = seo.SEOTests('test_search_keeps_every_article_in_initial_html')
+            contract.pages = {w.SITE + '/writing/': page}
+            with patch('test_seo.ROOT', root):
+                contract.test_search_keeps_every_article_in_initial_html()
+                # The relaxed count must still reject a genuinely missing card.
+                page.elements.remove(next(item for item in page.elements
+                                          if item[0] == 'article'))
+                with self.assertRaises(AssertionError):
+                    contract.test_search_keeps_every_article_in_initial_html()
 
     def test_render_is_deterministic_and_matches_committed_page(self):
         html = w.render(self.articles, self.template)
