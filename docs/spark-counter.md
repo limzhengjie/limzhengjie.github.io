@@ -51,7 +51,7 @@ site sends no cross-origin cookies to the counter.
 The shared script points the public GitHub Pages site to the Vercel production alias.
 Vercel previews and localhost use their own `/api/spark` endpoint. Never put the
 write token in that attribute. The counter key has no expiry; request IDs expire
-after 24 hours, and pending browser requests expire after one hour.
+after 24 hours, and pending browser requests expire after one hour. Expiry is checked both when restoring a tab session and before sending a batch from an open tab. When every pending batch has expired, the client reads the authoritative total; it never creates replacement IDs for uncertain writes.
 
 No paid plan, automatic upgrades, or ephemeral unclaimed database should be enabled
 for this feature. If storage is unavailable, visitors can still use the whole site.

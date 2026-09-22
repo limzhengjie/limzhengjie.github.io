@@ -8,6 +8,11 @@ const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/cs
   '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg' };
 
 async function run() {
+  const articles = JSON.parse(await fs.readFile(path.join(root, 'data/articles.json'), 'utf8'));
+  const articleCount = articles.length;
+  const researchCount = articles.filter(article => article.source === 'artemis').length;
+  const searchTitle = articles.find(article => article.source === 'artemis').title;
+  const searchQuery = searchTitle.toUpperCase().replace(/[AEIOU]/g, letter => letter + '\u0301');
   const server = http.createServer(async (req, res) => {
     try {
       let pathname = new URL(req.url, 'http://localhost').pathname;
@@ -44,19 +49,24 @@ async function run() {
             const query = page.getByRole('searchbox', { name: 'Search writing' });
             const links = await page.locator('.writing-read a').evaluateAll(els => els.map(el => el.href));
             const schema = await page.locator('script[type="application/ld+json"]').allTextContents();
-            assert.equal(await visible(), 32);
-            await query.fill('FÍGMA');
-            assert.equal(await visible(), 1);
-            assert.equal(await page.locator('#writing-results').textContent(), '1 article');
+            assert.equal(await visible(), articleCount);
+            await query.fill(searchQuery);
+            const matchingCount = await visible();
+            assert.ok(matchingCount > 0 && matchingCount < articleCount);
+            assert.equal(await page.getByRole('heading', { name: searchTitle, exact: true }).isVisible(), true);
+            assert.equal(await page.locator('#writing-results').textContent(),
+              `${matchingCount} ${matchingCount === 1 ? 'article' : 'articles'}`);
             await query.fill('Artemis September impossible');
             assert.equal(await visible(), 0);
             assert.match(await page.locator('#writing-results').textContent(), /No matching articles/);
             await query.press('Enter');
             assert.equal(page.url(), base + '/writing/');
-            await query.fill('artemis 2026');
-            assert.equal(await visible(), 7);
+            await query.fill('artemis research');
+            assert.equal(await page.locator('.writing-section').filter({
+              has: page.getByRole('heading', { name: 'Artemis research', exact: true }),
+            }).locator('.writing-card:visible').count(), researchCount);
             await page.getByRole('button', { name: 'Clear search' }).click();
-            assert.equal(await visible(), 32);
+            assert.equal(await visible(), articleCount);
             assert.equal(await query.evaluate(el => el === document.activeElement), true);
             assert.deepEqual(await page.locator('.writing-read a').evaluateAll(els => els.map(el => el.href)), links);
             assert.deepEqual(await page.locator('script[type="application/ld+json"]').allTextContents(), schema);
@@ -64,7 +74,14 @@ async function run() {
             // Wait for actual prefetch completion before testing the cached route.
             await page.waitForFunction(() => performance.getEntriesByType('resource').some(e =>
               new URL(e.name).pathname === '/designs/' && e.initiatorType === 'fetch' && e.responseEnd > 0));
+            await query.fill(searchQuery);
             await page.locator('.site-nav a[href="/designs/"]').click();
+            await page.waitForURL(base + '/designs/');
+            await page.goBack();
+            await page.waitForURL(base + '/writing/');
+            assert.equal(await query.inputValue(), searchQuery, 'Back lost the Writing query');
+            assert.equal(await visible(), matchingCount, 'Back lost the filtered results');
+            await page.goForward();
             await page.waitForURL(base + '/designs/');
             assert.equal(await page.evaluate(() => window.documentMarker), marker);
             const originals = await page.locator('.design-open').evaluateAll(els => els.map(el => el.href));
@@ -142,9 +159,12 @@ async function run() {
             assert.equal(await page.locator('.design-open').nth(finalIndex).evaluate(el => el === document.activeElement), true);
             await page.locator('.site-nav a[href="/writing/"]').click();
             await page.waitForURL(base + '/writing/');
-            assert.equal(await visible(), 32);
-            await page.getByRole('searchbox').fill('figma');
-            assert.equal(await visible(), 1, 'search did not reinitialize after navigation');
+            assert.equal(await query.inputValue(), searchQuery, 'cached tabs lost the latest query');
+            assert.equal(await visible(), matchingCount);
+            await page.getByRole('button', { name: 'Clear search' }).click();
+            assert.equal(await visible(), articleCount);
+            await page.getByRole('searchbox').fill(searchQuery);
+            assert.equal(await visible(), matchingCount, 'search did not reinitialize after navigation');
             if (process.env.GALLERY_ARTIFACT_DIR) await page.screenshot({ path: path.join(process.env.GALLERY_ARTIFACT_DIR, `${engine}-${theme}-${width}-search.png`) });
             await page.setViewportSize({ width: 320, height: 900 });
             await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
@@ -163,9 +183,9 @@ async function run() {
           if (disabled === 'search-script') await context.route('**/assets/js/writing.js*', route => route.abort());
           const page = await context.newPage();
           await page.goto(base + '/writing/');
-          assert.equal(await page.locator('.writing-card:visible').count(), 32);
+          assert.equal(await page.locator('.writing-card:visible').count(), articleCount);
           assert.equal(await page.locator('#writing-search').isVisible(), false);
-          assert.equal(await page.locator('.writing-read a[href^="https://"]').count(), 32);
+          assert.equal(await page.locator('.writing-read a[href^="https://"]').count(), articleCount);
           await context.close();
         }
 
@@ -191,7 +211,7 @@ async function run() {
         await page.getByRole('button', { name: 'Next image' }).click();
         assert.equal(await page.locator('.viewer-pager [role="status"]').textContent(), '3 of 4');
         await context.close();
-        console.log(`${engine}: no-JavaScript/blocked search retains 32 articles; failed image recovers on Next`);
+        console.log(`${engine}: no-JavaScript/blocked search retains ${articleCount} articles; failed image recovers on Next`);
       } finally { await browser.close(); }
     }
   } finally { await new Promise(resolve => server.close(resolve)); }

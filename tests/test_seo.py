@@ -234,7 +234,8 @@ class SEOTests(unittest.TestCase):
 
     def test_search_keeps_every_article_in_initial_html(self):
         page = self.pages[SITE + '/writing/']
-        self.assertEqual(len([a for a in page.attrs('article') if a.get('class') == 'writing-card']), 32)
+        articles = json.loads((ROOT / 'data/articles.json').read_text())
+        self.assertEqual(len([a for a in page.attrs('article') if a.get('class') == 'writing-card']), len(articles))
         for tag in ['section', 'li', 'article']:
             self.assertTrue(all('hidden' not in a for a in page.attrs(tag)), 'Search must not hide source articles')
         form = next(a for a in page.attrs('form') if a.get('id') == 'writing-search')

@@ -14,16 +14,18 @@ The enhancement keeps real, crawlable HTML links. An unfinished, failed, expired
 
 Only HTML is prefetched; the cache stays in memory and contains at most 12 pages. A page is fresh for 60 seconds and remains usable for up to 30 minutes so a long read does not immediately make the next tab click wait on the network. Intent events, navigation and scheduled warming revalidate older HTML in the background, sharing one pending request per page. A successful refresh is saved for the next visit and never replaces what someone is currently reading. A transient refresh failure keeps the usable copy; known redirects, 404s and 410s evict it. After 30 minutes, an unavailable refreshed page falls back to ordinary navigation.
 
-No service worker, persistent page cache, framework, polling timer or external runtime is added. A change in stylesheet or script URLs forces normal navigation. Changed shared assets use a content-hash query parameter in every page and the Writing template to avoid combining freshly loaded HTML with older cached scripts; update that parameter when changing those assets. Future page-specific scripts should use `site:load` for initialization and `site:before-render` for cleanup, or use different asset URLs to opt out.
+No service worker, persistent page cache, framework, polling timer or external runtime is added. A change in stylesheet or script URLs forces normal navigation. Changed shared assets use a content-hash query parameter in every page and the Writing template to avoid combining freshly loaded HTML with older cached scripts; run `python3 scripts/asset_versions.py` after changing those assets to update their references and regenerate Writing. Future page-specific scripts should use `site:load` for initialization and `site:before-render` for cleanup, or use different asset URLs to opt out.
 
 Each content change updates the title, description, robots directives, canonical, social metadata and JSON-LD. The theme preference and lamp persist. Focus moves to the main landmark, and history entries record the reading position for back/forward. The intro only runs on a first homepage visit; image viewer controls initialize for the newly inserted page.
+
+Writing keeps the latest search query in memory across cached tab changes and Back/Forward. Returning to Writing restores the filter before scroll restoration. Clear resets the remembered query; a full document reload starts fresh. Search terms never enter the URL, analytics, or persistent storage, and typing does not write browser history.
 
 ## Validation
 
 `npm run test:browser` includes the existing 132 layout/theme checks plus `tests/browser/navigation.cjs`:
 
 - Chromium and WebKit; 390px touch and 1440px keyboard navigation; light and dark modes.
-- Warm tab changes keep the same document and navigation/link nodes, with stable tab positions, correct active navigation, page metadata, photo and Projects noindex handling.
+- Warm tab changes keep the same document and navigation/link nodes, with stable tab positions, correct active navigation, page metadata, photo and Projects indexing metadata.
 - Shared navigation alignment and lamp clearance across all pages; no horizontal overflow at 320px with 200% text.
 - Theme changes, infographic viewing/zoom, first-visit intro cleanup, back/forward and restored reading positions.
 - No JavaScript, blocked navigation script, failed/pending preloads, data saving and expired cache all retain ordinary navigation.

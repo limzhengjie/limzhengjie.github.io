@@ -128,6 +128,20 @@ async function run() {
         await page.emulateMedia({ reducedMotion: 'reduce' });
         await page.waitForFunction(() => !document.querySelector('.spark-particle'));
         await count(page, before + 4); await settle(page);
+        // An open tab must stop retrying before the server forgets request IDs.
+        dropNext = true;
+        await page.getByRole('button', { name: 'Add a spark', exact: true }).click();
+        await page.getByRole('button', { name: 'Retry', exact: true }).waitFor();
+        const afterUncertainWrite = total;
+        saved.clear(); // Simulate expiry of Redis's deduplication records.
+        await page.clock.setFixedTime(new Date(Date.now() + 25 * 60 * 60 * 1000));
+        await page.getByRole('button', { name: 'Retry', exact: true }).click();
+        await settle(page);
+        assert.equal(total, afterUncertainWrite, 'an expired uncertain batch was counted again');
+        await count(page, afterUncertainWrite);
+        assert.equal(await page.evaluate(() => JSON.parse(sessionStorage.getItem('zj-spark-session-v1')).queue.length), 0);
+        await page.getByRole('button', { name: 'Add a spark', exact: true }).click();
+        await count(page, afterUncertainWrite + 1); await settle(page);
         await context.close();
         console.log(`${engine}: interrupted response, reload deduplication, explicit retry, pending navigation and motion change passed`);
         const blocked = await browser.newContext({ reducedMotion: 'reduce' });
