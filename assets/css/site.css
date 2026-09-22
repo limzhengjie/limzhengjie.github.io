@@ -557,7 +557,7 @@ h1 {
 }
 
 .experience-company {
-  flex: 1 1 9rem;
+  flex: 1 1 7.5rem;
   min-width: 0;
   overflow-wrap: anywhere;
   color: var(--fg);
@@ -566,6 +566,7 @@ h1 {
 }
 
 .experience-role,
+.experience-location,
 .experience-dates {
   color: var(--muted);
   font-size: 0.85rem;
@@ -575,6 +576,12 @@ h1 {
 .experience-role {
   flex: 0 0 100%;
   order: 1;
+}
+
+.experience-location {
+  flex: 0 0 100%;
+  order: 2;
+  font-size: 0.8rem;
 }
 
 .experience-dates {
