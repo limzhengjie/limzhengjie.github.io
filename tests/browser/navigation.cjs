@@ -107,8 +107,8 @@ async function run() {
                 assert.ok((await firstDemo.boundingBox()).height >= 44);
               }
               if (name === 'Home') {
-                assert.equal(await page.locator('.role').textContent(), 'Data and Research @ Artemis');
-                assert.ok(!(await page.locator('.about').textContent()).includes('Data and Research @ Artemis'));
+                assert.equal(await page.locator('.role').textContent(), 'FinTech Analyst and Data Engineer at Artemis Analytics');
+                assert.ok(!(await page.locator('.about').textContent()).includes('FinTech Analyst and Data Engineer at Artemis Analytics'));
                 assert.equal(await page.locator('.profile-portrait').count(), 1);
                 assert.equal(await page.locator('.site-boot').count(), 0);
                 assert.doesNotMatch(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
