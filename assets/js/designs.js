@@ -11,7 +11,7 @@
     const original = viewer.querySelector('#viewer-original');
     const zoom = viewer.querySelector('#viewer-zoom');
     const status = viewer.querySelector('.viewer-status');
-    const links = [...document.querySelectorAll('.design-open')];
+    const links = [...document.querySelectorAll('.design-open, .image-open')];
     let current = 0;
     let position;
     let opener;
@@ -51,7 +51,7 @@
       current = index;
       const link = links[index];
       opener = link;
-      title.textContent = link.closest('.design-piece').querySelector('h1, h3').textContent;
+      title.textContent = link.dataset.imageTitle || link.closest('.design-piece').querySelector('h1, h3').textContent;
       original.href = link.href;
       image.alt = link.querySelector('img').alt;
       image.removeAttribute('src');
@@ -138,7 +138,7 @@
 
     viewer.querySelector('#viewer-close').addEventListener('click', () => viewer.close());
     viewer.addEventListener('click', event => {
-      if (event.target === viewer) viewer.close();
+      if (event.target === viewer || event.target === stage) viewer.close();
     });
     viewer.addEventListener('close', () => {
       gesture = undefined;

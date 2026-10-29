@@ -141,12 +141,19 @@ header {
 }
 
 .profile-portrait {
+  display: block;
   width: 112px;
   height: 112px;
   margin: 0 auto 1.25rem;
   overflow: hidden;
   border-radius: 50%;
   background: var(--rule);
+  cursor: zoom-in;
+}
+
+.profile-portrait:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 5px;
 }
 
 .profile-portrait img {

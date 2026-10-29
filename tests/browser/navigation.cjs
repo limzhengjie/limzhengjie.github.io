@@ -71,6 +71,12 @@ async function run() {
               assert.equal(await page.evaluate(() => document.querySelector('.site-nav') === window.originalNavigation &&
                 [...document.querySelectorAll('.site-nav a')].every((link, i) => link === window.originalTabs[i])), true,
                 'page change replaced the shared navigation');
+              // WebKit can report the new URL before its scroll/layout update is painted.
+              // Observe the expected geometry rather than sampling that intermediate frame.
+              await page.waitForFunction(expected => {
+                const actual = document.querySelector('.site-nav').getBoundingClientRect();
+                return ['x', 'y', 'width', 'height'].every(key => Math.abs(actual[key] - expected[key]) < 1);
+              }, navBox);
               const nextBox = await page.locator('.site-nav').boundingBox();
               for (const key of ['x', 'y', 'width', 'height']) assert.ok(Math.abs(nextBox[key] - navBox[key]) < 1, `${name} moved the navigation ${key}`);
               const nextTabs = await page.locator('.site-nav a').evaluateAll(links => links.map(link => {
