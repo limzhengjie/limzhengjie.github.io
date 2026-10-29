@@ -2,7 +2,7 @@
 
 Static personal website at [limzhengjie.com](https://limzhengjie.com/), published with GitHub Pages.
 
-- `/`: biography, portrait, Home / Writing / Designs / Projects navigation and profile links.
+- `/`: biography, clickable portrait with a full-photo viewer, Home / Writing / Designs / Projects navigation and profile links.
 - `/writing/`: Artemis bylines first, then the latest 25 Learn To Invest articles.
 - `/designs/`: four dated infographics in a minimal image grid. Click a preview for a full-image viewer with zoom and an original-image link. The portfolio is indexable and included in the sitemap.
 - `/designs/<subject>/`: individual research graphics with a summary, data date, source credits and reporting context. Gallery titles link to these pages while image clicks keep opening the viewer.
