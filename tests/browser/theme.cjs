@@ -60,6 +60,9 @@ async function run() {
       try {
         const welcome = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, colorScheme: 'dark', reducedMotion: 'no-preference' });
         const home = await welcome.newPage();
+        // Keep assertion and image-decoding time outside the intro's six-second clock.
+        await home.clock.install();
+        await home.clock.pauseAt(Date.now() + 1000);
         await home.goto(base + '/', { waitUntil: 'domcontentloaded' });
         await home.locator('.site-boot').waitFor();
         await expectCenteredIntro(home);
@@ -69,7 +72,7 @@ async function run() {
         assert.ok(await home.locator('.profile-portrait img').evaluate(e =>
           e.naturalWidth >= e.getBoundingClientRect().width * devicePixelRatio), 'portrait has enough source pixels for a 3× display');
         assert.equal(await home.locator('.profile-portrait img').evaluate(e => getComputedStyle(e).filter), 'none');
-        await home.waitForTimeout(3200);
+        await home.clock.runFor(3200);
         assert.ok(await home.locator('.site-boot').isVisible(), 'startup ends before readers can see it');
         assert.equal(await home.locator('.boot-skip').evaluate(e => e === document.activeElement), true);
         for (let i = 0; i < 3; i++) {
@@ -83,6 +86,7 @@ async function run() {
             focus: document.activeElement === document.querySelector('main') };
         });
         assert.deepEqual(skipped, { removed: true, locked: false, focus: true }, 'X must reveal the homepage synchronously');
+        await home.clock.resume();
         await home.locator('.theme-lamp').click();
         await expectTheme(home, 'light');
         assert.equal(await home.locator('.lamp-fixture').evaluate(e => getComputedStyle(e).animationName), 'lamp-pull');
@@ -114,10 +118,13 @@ async function run() {
 
         const automatic = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'light', reducedMotion: 'no-preference' });
         const automaticPage = await automatic.newPage();
+        await automaticPage.clock.install();
+        await automaticPage.clock.pauseAt(Date.now() + 1000);
         await automaticPage.goto(base + '/', { waitUntil: 'domcontentloaded' });
         await expectCenteredIntro(automaticPage);
-        await automaticPage.waitForTimeout(3500);
+        await automaticPage.clock.runFor(3500);
         assert.ok(await automaticPage.locator('.site-boot').isVisible(), 'startup should last longer than the old introduction');
+        await automaticPage.clock.runFor(2700);
         await automaticPage.locator('.site-boot').waitFor({ state: 'detached', timeout: 5000 });
         assert.equal(await automaticPage.locator('main').evaluate(e => e === document.activeElement), true);
         assert.equal(await automaticPage.locator('body').evaluate(e => getComputedStyle(e).overflow === 'hidden'), false);
