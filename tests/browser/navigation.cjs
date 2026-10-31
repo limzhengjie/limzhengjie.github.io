@@ -76,7 +76,13 @@ async function run() {
               await page.waitForFunction(expected => {
                 const actual = document.querySelector('.site-nav').getBoundingClientRect();
                 return ['x', 'y', 'width', 'height'].every(key => Math.abs(actual[key] - expected[key]) < 1);
-              }, navBox);
+              }, navBox).catch(async error => {
+                const actual = await page.evaluate(() => ({
+                  box: document.querySelector('.site-nav').getBoundingClientRect().toJSON(),
+                  scrollY, viewport: innerWidth, focused: document.activeElement?.tagName,
+                }));
+                throw new Error(`${engine} ${theme} ${width}px ${name}: expected ${JSON.stringify(navBox)}, got ${JSON.stringify(actual)}`, { cause: error });
+              });
               const nextBox = await page.locator('.site-nav').boundingBox();
               for (const key of ['x', 'y', 'width', 'height']) assert.ok(Math.abs(nextBox[key] - navBox[key]) < 1, `${name} moved the navigation ${key}`);
               const nextTabs = await page.locator('.site-nav a').evaluateAll(links => links.map(link => {

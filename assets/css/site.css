@@ -6,6 +6,8 @@
   --rule: #d8d4cb;
   --focus: #1c1b18;
   --brand-filter: none;
+  --experience-logo-light: block;
+  --experience-logo-dark: none;
   --lamp-shade: #302e29;
   --lamp-bulb: #e4ba75;
   --lamp-glow: 0.45;
@@ -20,6 +22,8 @@
     --rule: #3a3934;
     --focus: #eeebe4;
     --brand-filter: invert(1);
+    --experience-logo-light: none;
+    --experience-logo-dark: block;
     --lamp-shade: #777166;
     --lamp-bulb: #858075;
     --lamp-glow: 0;
@@ -34,6 +38,8 @@
   --rule: #3a3934;
   --focus: #eeebe4;
   --brand-filter: invert(1);
+  --experience-logo-light: none;
+  --experience-logo-dark: block;
   --lamp-shade: #777166;
   --lamp-bulb: #858075;
   --lamp-glow: 0;
@@ -564,12 +570,29 @@ h1 {
 }
 
 .experience-company {
-  flex: 1 1 7.5rem;
+  flex: 1 1 5rem;
   min-width: 0;
-  overflow-wrap: anywhere;
-  color: var(--fg);
-  font-size: 0.95rem;
-  font-weight: 500;
+}
+
+.experience-company img {
+  display: block;
+  width: auto;
+  height: 1.5rem;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.experience-logo-monochrome {
+  filter: var(--brand-filter);
+}
+
+.experience-company .experience-logo-light {
+  display: var(--experience-logo-light);
+}
+
+.experience-company .experience-logo-dark {
+  display: var(--experience-logo-dark);
 }
 
 .experience-role,
