@@ -8,6 +8,8 @@ The homepage title now includes both Zheng Jie Lim and Lim Zheng Jie. Its descri
 
 The company logos are present in the deployed HTML and load when Experience is expanded. Its previous roles remain in the existing native disclosure. Search metadata and biography changes require no new JavaScript, dependencies or styling.
 
+Publishing had also failed since November 5 because the Artemis/Substack archive now returns `{posts, nextCursor}` and rejects numeric `offset` requests. The writing collector follows the supplied opaque `cursor`, including after short pages, and rejects malformed or repeated cursors. Existing author filtering, article-preservation checks and failure propagation remain in place. The updated collector fetched the full existing selection successfully before publication.
+
 Do not add invented aliases such as spelling mistakes, hidden keyword text, duplicate name-targeted pages or a meta-keywords tag. Google can match related queries without every spelling appearing verbatim, and no implementation can promise first place. Follow [Google's SEO starter guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide) and [ProfilePage guidance](https://developers.google.com/search/docs/appearance/structured-data/profile-page). Search Console performance observations belong in local review notes rather than this public repository.
 
 ## September 14: crawlability and browsing follow-up

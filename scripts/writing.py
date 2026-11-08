@@ -116,10 +116,20 @@ def person(byline):
 def artemis_posts(fetch=fetch_json):
     posts, seen = [], set()
     previous_date = None
+    cursor, seen_cursors = None, set()
     for page in range(MAX_PAGES):
-        batch = fetch('https://research.artemis.ai/api/v1/archive?' + urlencode({'sort': 'new', 'offset': page * 20, 'limit': 20}))
+        query = {'sort': 'new', 'limit': 20}
+        if cursor is not None:
+            query['cursor'] = cursor
+        response = fetch('https://research.artemis.ai/api/v1/archive?' + urlencode(query))
+        batch = response.get('posts') if isinstance(response, dict) else None
         if not isinstance(batch, list) or (page == 0 and not batch):
             raise ValueError('Artemis archive is unavailable or malformed')
+        next_cursor = response.get('nextCursor')
+        if next_cursor is not None:
+            if not isinstance(next_cursor, str) or not next_cursor or next_cursor in seen_cursors:
+                raise ValueError('Artemis archive returned an invalid or repeated cursor')
+            seen_cursors.add(next_cursor)
         reached_start = False
         for raw in batch:
             published = date.fromisoformat(raw['post_date'][:10]).isoformat()
@@ -144,8 +154,9 @@ def artemis_posts(fetch=fetch_json):
             posts.append({'source': 'artemis', 'url': url, 'title': title, 'date': published,
                           'authors': [person(b) for b in bylines],
                           'source_summary': raw.get('description') or raw.get('subtitle') or ''})
-        if reached_start or len(batch) < 20:
+        if reached_start or next_cursor is None:
             return posts
+        cursor = next_cursor
     raise ValueError('Artemis pagination limit reached before completing the archive')
 
 
