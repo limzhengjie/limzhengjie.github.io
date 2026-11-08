@@ -2,6 +2,16 @@
 
 The site should help people find Zheng Jie Lim and his research on crypto, fintech and investing. Preserve the minimal design; give individual work useful context on its own page rather than filling the homepage or gallery with keyword lists.
 
+## November 8, 2026: name-search relevance
+
+The homepage title now includes both Zheng Jie Lim and Lim Zheng Jie. Its description, visible aliases and Person/ProfilePage data also identify the published short name Zheng Jie and existing social handle. The profile describes the actual research and data-engineering work, links to Projects, and surfaces the Forbes/Solana recognition already documented on Small Wins. The homepage sitemap date reflects this content update; unchanged pages retain their existing dates.
+
+The company logos are present in the deployed HTML and load when Experience is expanded. Its previous roles remain in the existing native disclosure. Search metadata and biography changes require no new JavaScript, dependencies or styling.
+
+Publishing had also failed since November 5 because the Artemis/Substack archive now returns `{posts, nextCursor}` and rejects numeric `offset` requests. The writing collector follows the supplied opaque `cursor`, including after short pages, and rejects malformed or repeated cursors. Existing author filtering, article-preservation checks and failure propagation remain in place. The updated collector fetched the full existing selection successfully before publication.
+
+Do not add invented aliases such as spelling mistakes, hidden keyword text, duplicate name-targeted pages or a meta-keywords tag. Google can match related queries without every spelling appearing verbatim, and no implementation can promise first place. Follow [Google's SEO starter guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide) and [ProfilePage guidance](https://developers.google.com/search/docs/appearance/structured-data/profile-page). Search Console performance observations belong in local review notes rather than this public repository.
+
 ## September 14: crawlability and browsing follow-up
 
 A fresh production crawl found all eight sitemap pages reachable through initial HTML links within two clicks of Home. They returned 200 with unique titles/descriptions, self canonicals, valid JSON-LD and no indexing block. All 19 inspected image/script/style assets loaded. Canonical host variants, the real 404, and Me/Projects/Vercel exclusions behaved as intended.

@@ -40,30 +40,47 @@ class SourceTests(unittest.TestCase):
         weekly['title'] = 'This Week in Digital Finance'
         other_weekly = artemis_row(5)
         other_weekly['title'] = 'Artemis Weekly Digital Finance Fundamentals 2026.4.11'
-        posts = w.artemis_posts(lambda _: [artemis_row(), other, coauthored, weekly, other_weekly])
+        posts = w.artemis_posts(lambda _: {'posts': [artemis_row(), other, coauthored, weekly, other_weekly], 'nextCursor': None})
         self.assertEqual(len(posts), 2)
         self.assertEqual(len(posts[1]['authors']), 2)
         self.assertEqual(posts[1]['authors'][1]['@id'], w.SITE + '/#person')
 
-    def test_archive_paginates_past_first_twenty_posts(self):
+    def test_archive_follows_opaque_cursor_even_after_a_short_page(self):
         calls = []
         def fetch(url):
-            offset = int(parse_qs(urlsplit(url).query)['offset'][0])
-            calls.append(offset)
-            return [artemis_row(i, ('other',)) for i in range(20)] if offset == 0 else [artemis_row(21)]
+            query = parse_qs(urlsplit(url).query)
+            self.assertNotIn('offset', query)
+            cursor = query.get('cursor', [None])[0]
+            calls.append(cursor)
+            return {'posts': [artemis_row(1, ('other',))], 'nextCursor': 'opaque+/='} if cursor is None else {'posts': [artemis_row(21)], 'nextCursor': None}
         self.assertEqual(len(w.artemis_posts(fetch)), 1)
-        self.assertEqual(calls, [0, 20])
+        self.assertEqual(calls, [None, 'opaque+/='])
+
+    def test_archive_stops_at_missing_cursor_even_after_a_full_page(self):
+        def fetch(url):
+            self.assertNotIn('cursor', parse_qs(urlsplit(url).query))
+            return {'posts': [artemis_row(i) for i in range(20)], 'nextCursor': None}
+        self.assertEqual(len(w.artemis_posts(fetch)), 20)
+
+    def test_archive_rejects_invalid_and_repeated_cursors(self):
+        for cursor in ['', 20, {}, []]:
+            with self.subTest(cursor=cursor), self.assertRaises(ValueError):
+                w.artemis_posts(lambda _: {'posts': [artemis_row()], 'nextCursor': cursor})
+        with self.assertRaisesRegex(ValueError, 'cursor'):
+            w.artemis_posts(lambda _: {'posts': [artemis_row(1, ('other',))], 'nextCursor': 'repeated'})
 
     def test_failure_during_pagination_propagates(self):
         def fetch(url):
-            if 'offset=0' in url:
-                return [artemis_row(i) for i in range(20)]
+            if 'cursor=' not in url:
+                return {'posts': [artemis_row(i) for i in range(20)], 'nextCursor': 'next'}
             raise OSError('source outage')
         with self.assertRaises(OSError):
             w.artemis_posts(fetch)
 
     def test_empty_and_missing_bylines_fail_closed(self):
-        for rows in [[], [{'post_date': '2026-09-01'}], {'error': 'rate limit'}]:
+        for rows in [[], [{'post_date': '2026-09-01'}], {'error': 'rate limit'},
+                     {'posts': [], 'nextCursor': None},
+                     {'posts': [{'post_date': '2026-09-01'}], 'nextCursor': None}]:
             with self.subTest(rows=rows), self.assertRaises(ValueError):
                 w.artemis_posts(lambda _: rows)
 
