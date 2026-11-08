@@ -716,6 +716,30 @@ nav a:focus-visible {
   border-radius: 2px;
 }
 
+.profile-links ul {
+  gap: 0.35rem clamp(0.15rem, 1.5vw, 0.65rem);
+}
+
+.profile-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  text-decoration: none;
+}
+
+.profile-links svg {
+  display: block;
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.profile-links a:hover {
+  color: var(--muted);
+}
+
 @media (max-width: 420px) {
   nav ul {
     gap: 0.45rem 1.1rem;
