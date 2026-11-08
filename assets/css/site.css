@@ -480,7 +480,8 @@ h1 {
   }
 }
 
-.about a {
+.about a,
+.selected-work a {
   color: var(--fg);
   text-decoration: underline;
   text-decoration-thickness: 1.5px;
@@ -488,15 +489,40 @@ h1 {
   text-underline-offset: 0.2em;
 }
 
-.about a:hover {
+.about a:hover,
+.selected-work a:hover {
   text-decoration-color: var(--fg);
 }
 
-.about a:focus-visible {
+.about a:focus-visible,
+.selected-work a:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
   border-radius: 2px;
 }
+
+.selected-work {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  text-align: left;
+  font: 0.9rem/1.5 "Avenir Next", "Segoe UI", system-ui, sans-serif;
+}
+
+.selected-work h2,
+.selected-work h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1em;
+  font-weight: 500;
+}
+
+.selected-work h2 { margin-bottom: 1.25rem; }
+.selected-work h3 { font-size: 1rem; }
+.work-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 1.5rem; }
+.selected-work p { margin: 0 0 0.65rem; color: var(--muted); }
+.selected-work .work-note { color: var(--muted); font-size: 0.8rem; }
+.selected-work ul { margin: 0; padding: 0; list-style: none; }
+.selected-work a { display: inline-block; min-height: 44px; padding: 0.6rem 0; }
 
 /* Keep the current role visible; one native disclosure reveals earlier roles. */
 .experience {

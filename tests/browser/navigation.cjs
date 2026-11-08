@@ -119,7 +119,7 @@ async function run() {
                 assert.ok((await firstDemo.boundingBox()).height >= 44);
               }
               if (name === 'Home') {
-                assert.equal(await page.locator('.role').textContent(), 'Data and Research @ Artemis');
+                assert.equal(await page.locator('.role').textContent(), 'Data engineer & investment researcher');
                 assert.ok(!(await page.locator('.about').textContent()).includes('Data and Research @ Artemis'));
                 assert.equal(await page.locator('.profile-portrait').count(), 1);
                 assert.equal(await page.locator('.site-boot').count(), 0);
